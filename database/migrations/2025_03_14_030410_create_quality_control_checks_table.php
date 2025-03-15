@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('quality_control_checks', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->enum('type', ['receipt', 'return', 'admin_return']);
+            $table->text('condition');
+            $table->boolean('is_damaged');
+            $table->dateTime('checked_at');
             $table->timestamps();
         });
     }

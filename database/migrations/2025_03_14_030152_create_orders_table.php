@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->dateTime('order_date');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->enum('pickup_method', ['pickup', 'cod']);
+            $table->decimal('total_cost', 10, 2);
+            $table->enum('status', ['pending', 'processed', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }

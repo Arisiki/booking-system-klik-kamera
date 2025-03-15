@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_items', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('quantity');
-            $table->decimal('rental_cost', 10, 2);
+            $table->unsignedBigInteger('imageable_id');
+            $table->string('imageable_type');
+            $table->string('image_path');
+            $table->boolean('is_primary')->default(false);
             $table->timestamps();
+
+            $table->index(['imageable_id', 'imageable_type']);
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('images');
     }
 };

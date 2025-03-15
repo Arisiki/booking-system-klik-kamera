@@ -17,7 +17,9 @@ class NotificationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'type' => fake()->randomElement(['low_stock', 'new_order', 'complaint']),
+            'message' => fake()->sentence,
+            'is_read' => fake()->boolean(30),
         ];
     }
 }
