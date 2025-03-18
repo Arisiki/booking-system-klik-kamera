@@ -15,10 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('category');
+            $table->string('camera_type')->nullable();
+            $table->string('brand')->nullable();
             $table->longText('description')->nullable();
             $table->decimal('price_per_day', 10, 2);
             $table->integer('stock');
-            $table->string('image_path');
+            $table->string('image_path')->nullable();
             $table->timestamps();
         });
     }

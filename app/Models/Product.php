@@ -13,6 +13,8 @@ class Product extends Model
     protected $fillable = [
         'name',
         'category',
+        'camera_type',
+        'brand',
         'description',
         'price_per_day',
         'stock',
@@ -42,6 +44,42 @@ class Product extends Model
 
     public function images()
     {
-        return $this->hasMany(Image::class);
+        return $this->morphMany(Image::class, 'imageable');
+    }
+
+    public function scopeAvailableForDates($query, $startDate, $endDate)
+    {
+        return $query->whereDoesntHave('orderItems', function ($query) use ($startDate, $endDate) {
+            $query->whereHas('order', function ($query) use ($startDate, $endDate) {
+                $query->where('status', '!=', 'cancelled')
+                    ->where(function ($query) use ($startDate, $endDate) {
+                        $query->whereBetween('start_date', [$startDate, $endDate])
+                            ->orWhereBetween('end_date', [$startDate, $endDate])
+                            ->orWhere(function ($query) use ($startDate, $endDate) {
+                                $query->where('start_date', '<=', $startDate)
+                                    ->where('end_date', '>=', $endDate);
+                            });
+                    });
+            });
+        })->where('stock', '>', 0);
+    }
+
+    public function isAvailableForDates($startDate, $endDate)
+    {
+        $conflictingOrders = $this->orderItems()
+            ->whereHas('order', function ($query) use ($startDate, $endDate) {
+                $query->where('status', '!=', 'cancelled')
+                    ->where(function ($query) use ($startDate, $endDate) {
+                        $query->whereBetween('start_date', [$startDate, $endDate])
+                            ->orWhereBetween('end_date', [$startDate, $endDate])
+                            ->orWhere(function ($query) use ($startDate, $endDate) {
+                                $query->where('start_date', '<=', $startDate)
+                                    ->where('end_date', '>=', $endDate);
+                            });
+                    });
+            })->count();
+
+        // Jika tidak ada orderItems, anggap tersedia
+        return $conflictingOrders === 0 && $this->stock > 0;
     }
 }

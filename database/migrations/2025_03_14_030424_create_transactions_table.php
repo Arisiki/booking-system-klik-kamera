@@ -17,6 +17,8 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->string('payment_method', 100);
             $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            $table->enum('type', ['receipt', 'return', 'admin_return']);
+            $table->enum('condition', ['good', 'damaged'])->nullable();
             $table->boolean('is_offline')->default(false);
             $table->dateTime('transaction_date');
             $table->timestamps();

@@ -15,12 +15,13 @@ class Transaction extends Model
         'product_id',
         'type',
         'condition',
-        'is_demaged',
+        'is_damaged',
         'checked_at'
     ];
 
     protected $casts = [
         'type' => 'string', // ENUM('receipt', 'return', 'admin_return')
+        'condition' => 'string',
         'is_damaged' => 'boolean',
         'checked_at' => 'datetime',
     ];
