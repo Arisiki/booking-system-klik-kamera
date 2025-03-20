@@ -4,6 +4,8 @@ import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { format, parse, addDays, eachDayOfInterval } from 'date-fns'; 
+import MapPicker from '@/Components/MapPicker';
+import { address } from '@/data';
 
 export default function BookingForms({ product, onClose, isAddToCart }) {
     const [unavailableDates, setUnavailableDates] = useState([]);
@@ -19,7 +21,22 @@ export default function BookingForms({ product, onClose, isAddToCart }) {
         start_date: format(new Date(), 'yyyy-MM-dd'),
         end_date: format(new Date(), 'yyyy-MM-dd'),
         pickup_method: 'pickup',
+        pickupAddress: address && address.length > 0 ? address[0].value : ''
     });
+
+    // Update pickupAddress when pickup_method changes
+    useEffect(() => {
+        if (data.pickup_method === 'cod') {
+            setData('pickupAddress', ''); 
+        } else {
+            setData('pickupAddress', address && address.length > 0 ? address[0].value : '');
+        }
+    }, [data.pickup_method]);
+
+    // Function to receive address from MapPicker
+    const handleAddressSelect = (fullAddress) => {
+        setData('pickupAddress', fullAddress);
+    };
 
     useEffect(() => {
         fetch(`/products/${product.id}/check-availability?start_date=${data.start_date}&end_date=${data.end_date}`, {
@@ -45,7 +62,6 @@ export default function BookingForms({ product, onClose, isAddToCart }) {
             .catch(error => console.log('Error fetching availability:', error));
     }, [product.id]);
 
- 
     const disabledDates = unavailableDates.flatMap(range => {
         const start = parse(range.start_date, 'yyyy-MM-dd', new Date());
         const end = parse(range.end_date, 'yyyy-MM-dd', new Date());
@@ -141,17 +157,60 @@ export default function BookingForms({ product, onClose, isAddToCart }) {
                     {errors.start_date && <span>{errors.start_date}</span>}
                     {errors.end_date && <span>{errors.end_date}</span>}
                 </div>
+                
                 <div>
                     <label>Pickup Method:</label>
-                    <select
-                        value={data.pickup_method}
-                        onChange={(e) => setData('pickup_method', e.target.value)}
-                    >
-                        <option value="pickup">Pickup</option>
-                        <option value="cod">Cash on Delivery</option>
-                    </select>
+                    <div>
+                        <label>
+                            <input
+                                type="radio"
+                                value="pickup"
+                                checked={data.pickup_method === 'pickup'}
+                                onChange={() => setData('pickup_method', 'pickup')}
+                            />
+                            Pickup
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                value="cod"
+                                checked={data.pickup_method === 'cod'}
+                                onChange={() => setData('pickup_method', 'cod')}
+                            />
+                            COD (Cash on Delivery)
+                        </label>
+                    </div>
                     {errors.pickup_method && <span>{errors.pickup_method}</span>}
                 </div>
+
+                {/* Address selection section */}
+                {data.pickup_method === 'pickup' ? (
+                    <div>
+                        <label>
+                            Pilih Alamat:
+                            <select
+                                value={data.pickupAddress}
+                                onChange={(e) => setData('pickupAddress', e.target.value)}
+                            >
+                                {address.map((addr, index) => (
+                                    <option key={index} value={addr.value}>
+                                        {addr.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        {errors.pickupAddress && <span>{errors.pickupAddress}</span>}
+                    </div>
+                ) : (
+                    <div>
+                        <MapPicker 
+                            onAddressSelect={handleAddressSelect} 
+                            initialAddress={data.pickupAddress} 
+                        />
+                        {errors.pickupAddress && <span>{errors.pickupAddress}</span>}
+                    </div>
+                )}
+                
                 <button type="submit" disabled={processing || dateError}>
                     {isAddToCart ? 'Add to Cart' : 'Book Now'}
                 </button>

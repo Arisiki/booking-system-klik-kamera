@@ -25,6 +25,8 @@ class OrderItemsSeeder extends Seeder
                 OrderItems::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
+                    'address' => 'penatih',
+                    'pickup_method' => fake()->randomElement(['pickup', 'cod']),
                     'quantity' => rand(1, 2),
                     'rental_cost' => $product->price_per_day * $days,
                 ]);

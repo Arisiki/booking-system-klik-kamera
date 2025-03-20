@@ -14,7 +14,9 @@ class OrderItems extends Model
         'order_id',
         'product_id',
         'quantity',
-        'rental_cost'
+        'rental_cost',
+        'pickup_method',
+        'address'
     ];
 
     protected $casts = [

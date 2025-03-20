@@ -3,8 +3,11 @@ import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 export default function Checkout() {
-    const { order, clientKey, snapToken } = usePage().props;
+    const { order, clientKey, snapToken, productItems } = usePage().props;
     const [isSnapReady, setIsSnapReady] = useState(false);
+  
+    console.log(order);
+    
     
     useEffect(() => {
         // You can also change below url value to any script url you wish to load, 
@@ -31,7 +34,6 @@ export default function Checkout() {
       }, [clientKey]);
 
       
-
       const handlePayment = () => {
         if(isSnapReady && window.snap) {
             window.snap.embed(snapToken, {
@@ -55,23 +57,37 @@ export default function Checkout() {
         }
       }
 
+      useEffect(() => {
+        if(isSnapReady && snapToken && window.snap)
+        {
+            setTimeout(() => {
+                handlePayment();
+            }, 500)
+        }
+
+      }, [isSnapReady])
+
+     
+
     return (
         <div className='flex gap-2'>
             <div>
                 <h1 className='text-2xl font-bold'>Checkout</h1>
                 <h3>Order Details</h3>
-                <p>Order ID: {order.id}</p>
-                <p>User: {order.user.name}</p>
-                <p>Order Date: {order.order_date}</p>
-                <p>Start Date: {order.start_date}</p>
-                <p>End Date: {order.end_date}</p>
+                <p>Order Date: {new Date(order.order_date).toLocaleDateString('id-ID', {
+                    day: 'numeric', month: 'long', year:'numeric'
+                })}</p>
+                <p>Start Date: {new Date(order.start_date).toLocaleDateString('id-ID', {
+                    day: 'numeric', month: 'long', year:'numeric'
+                })}</p>
+                <p>End Date: {new Date(order.end_date).toLocaleDateString('id-ID', {
+                    day: 'numeric', month: 'long', year:'numeric'
+                })}</p>
                 <p>Pickup Method: {order.pickup_method}</p>
                 <p>Total Cost: Rp {order.total_cost}</p>
                 <p>Status: {order.status}</p>
 
-                <button onClick={handlePayment} disabled={!isSnapReady} className='border px-4 py-2 mt-4'>
-                {isSnapReady ? 'Proceed to Payment' : 'Loading Payment System...'}
-                </button>
+                
             </div>
             <div>
                 <h3>Order Items</h3>
@@ -80,6 +96,7 @@ export default function Checkout() {
                         <p>Product: {item.product.name}</p>
                         <p>Quantity: {item.quantity}</p>
                         <p>Rental Cost: Rp {item.rental_cost}</p>
+                        <p>Pick Up Address: {item.address}</p>
                     </div>
                 ))}
             </div>

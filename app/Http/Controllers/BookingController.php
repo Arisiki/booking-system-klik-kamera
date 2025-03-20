@@ -57,6 +57,7 @@ class BookingController extends Controller
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
             'pickup_method' => 'required|in:pickup,cod',
+            'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
         ]);
 
         try {
@@ -65,7 +66,8 @@ class BookingController extends Controller
                 $request->quantity,
                 $request->start_date,
                 $request->end_date,
-                $request->pickup_method
+                $request->pickup_method,
+                $request->pickupAddress
             );
 
             return redirect()->route('cart.show')->with('success', 'Product added to cart!');
@@ -84,6 +86,7 @@ class BookingController extends Controller
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
             'pickup_method' => 'required|in:pickup,cod',
+            'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
         ]);
 
         // Cek ketersediaan
@@ -106,6 +109,7 @@ class BookingController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'pickup_method' => $request->pickup_method,
+            'address' => $request->pickupAddress,
             'total_cost' => $rentalCost,
             'status' => 'pending',
         ]);
@@ -145,13 +149,15 @@ class BookingController extends Controller
             return redirect()->route('products.index')->withErrors(['error' => 'Cart is empty.']);
         }
 
+        $firstItem = $cartItems[0];
+
         $order = Order::create([
             'user_id' => auth()->id(),
             'order_date' => now(),
             'start_date' => collect($cartItems)->min('start_date'),
             'end_date' => collect($cartItems)->max('end_date'),
-            'pickup_method' => $cartItems[0]['pickup_method'],
-            'address' => null,
+            'pickup_method' => $firstItem['pickup_method'],
+            'address' => $firstItem['pickup_address'],
             'total_cost' => collect($cartItems)->sum('rental_cost'),
             'status' => 'pending',
         ]);
@@ -161,6 +167,8 @@ class BookingController extends Controller
                 'order_id' => $order->id,
                 'product_id' => $item['product']['id'],
                 'quantity' => $item['quantity'],
+                'address' => $item['pickup_address'],
+                'pickup_method' => $item['pickup_method'],
                 'rental_cost' => $item['rental_cost'],
             ]);
         }
@@ -176,6 +184,16 @@ class BookingController extends Controller
     public function showCheckout(Order $order)
     {
         $order->load('orderItems.product', 'user');
+        $itemDetails = [];
+        foreach ($order->orderItems as $orderItem) {
+            $itemDetails[] = [
+                'id' => 'P' . $orderItem->product->id,
+                'price' => $orderItem->rental_cost / $orderItem->quantity,
+                'quantity' => $orderItem->quantity,
+                'name' => $orderItem->product->name,
+            ];
+        }
+
 
         // Payment Gateway (Midtrans)
         \Midtrans\Config::$serverKey = config('mitrands.serverKey');
@@ -193,13 +211,15 @@ class BookingController extends Controller
                 'email' => auth()->user()->email,
                 'phone' => '08111222333',
             ),
+            'item_details' => $itemDetails
+
         );
         $snapToken = \Midtrans\Snap::getSnapToken($params);
 
         return Inertia::render('Bookings/Checkout', [
             'order' => $order,
             'clientKey' => config('mitrands.clientKey'),
-            'snapToken' => $snapToken
+            'snapToken' => $snapToken,
         ]);
     }
 
