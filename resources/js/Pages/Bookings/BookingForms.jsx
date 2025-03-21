@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
@@ -7,7 +7,8 @@ import { format, parse, addDays, eachDayOfInterval } from 'date-fns';
 import MapPicker from '@/Components/MapPicker';
 import { address } from '@/data';
 
-export default function BookingForms({ product, onClose, isAddToCart }) {
+export default function BookingForms({ product, onClose, isAddToCart}) {
+    const {auth} = usePage().props;
     const [unavailableDates, setUnavailableDates] = useState([]);
     const [dateError, setDateError] = useState('');
     const [dateRange, setDateRange] = useState({
@@ -15,13 +16,17 @@ export default function BookingForms({ product, onClose, isAddToCart }) {
         endDate: new Date(),
         key: 'selection',
     });
+    
 
     const { data, setData, post, processing, errors } = useForm({
         quantity: 1,
         start_date: format(new Date(), 'yyyy-MM-dd'),
         end_date: format(new Date(), 'yyyy-MM-dd'),
         pickup_method: 'pickup',
-        pickupAddress: address && address.length > 0 ? address[0].value : ''
+        pickupAddress: address && address.length > 0 ? address[0].value : '',
+        userName: auth.user.name,
+        email: auth.user.email,
+        phoneNumber: 0
     });
 
     // Update pickupAddress when pickup_method changes
@@ -129,10 +134,40 @@ export default function BookingForms({ product, onClose, isAddToCart }) {
         });
     };
 
+    console.log(data);
+    
     return (
         <div>
             <h3>Booking Form for {product.name}</h3>
             <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Nama</label>
+                    <input 
+                        type='text'
+                        value={auth.user.name}
+                        onChange={(e) => setData('userName', e.target.value)}
+                        maxLength={25}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input 
+                        type='email'
+                        value={auth.user.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>No Hp</label>
+                    <input 
+                        type='number'
+                        value={auth.user.phoneNumber}
+                        onChange={(e) => setData('phoneNumber', e.target.value)}
+                        required
+                    />
+                </div>
                 <div>
                     <label>Quantity:</label>
                     <input

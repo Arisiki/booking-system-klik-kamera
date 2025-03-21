@@ -40,20 +40,6 @@ export default function Cart() {
                     ))}
                     <h3>Total Cost: Rp {totalCost}</h3>
 
-                    <div>
-                        <form>
-                            <label>
-                                Masukan Nama:
-                                <input
-                                    type="text"
-                                    maxLength={20}
-                                    value={data.userName}
-                                    onChange={(e) => setData('userName', e.target.value)}
-                                />
-                            </label>
-                        </form>
-                    </div>
-
                     <button
                         onClick={handleCheckout}
                         disabled={processing}
