@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 
 class CartHelper
 {
-  public static function addToCart($productId, $quantity, $startDate, $endDate, $pickupMethod, $pickupAddress = null)
+  public static function addToCart($productId, $quantity, $startDate, $endDate, $pickupMethod, $pickupAddress = null, $userName, $email, $phoneNumber)
   {
     $product = Product::findOrFail($productId);
 
@@ -36,6 +36,9 @@ class CartHelper
       'pickup_method' => $pickupMethod,
       'pickup_address' => $pickupAddress,
       'rental_cost' => $rentalCost,
+      'user_name' => $userName,
+      'email' => $email,
+      'phone_number' => $phoneNumber
     ];
 
     // Simpan kembali ke session
@@ -60,6 +63,9 @@ class CartHelper
           'pickup_method' => $item['pickup_method'],
           'pickup_address' => $item['pickup_address'] ?? null,
           'rental_cost' => $item['rental_cost'],
+          'user_name' => $item['user_name'],
+          'email' => $item['email'],
+          'phone_number' => $item['phone_number']
         ];
       }
     }

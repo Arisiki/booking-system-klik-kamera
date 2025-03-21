@@ -30,6 +30,9 @@ export default function Cart() {
                     {cartItems.map((item, index) => (
                         <div key={index}>
                             <h3>{item.product.name}</h3>
+                            <p>User: {item.user_name}</p>
+                            <p>Email: {item.email}</p>
+                            <p>Phone: {item.phone_number}</p>
                             <p>Quantity: {item.quantity}</p>
                             <p>Start Date: {item.start_date}</p>
                             <p>End Date: {item.end_date}</p>

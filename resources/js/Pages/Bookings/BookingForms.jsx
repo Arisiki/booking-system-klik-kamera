@@ -24,9 +24,9 @@ export default function BookingForms({ product, onClose, isAddToCart}) {
         end_date: format(new Date(), 'yyyy-MM-dd'),
         pickup_method: 'pickup',
         pickupAddress: address && address.length > 0 ? address[0].value : '',
-        userName: auth.user.name,
-        email: auth.user.email,
-        phoneNumber: 0
+        userName: auth.user.name || '',
+        email: auth.user.email || '',
+        phoneNumber: auth.user.phoneNumber || ''
     });
 
     // Update pickupAddress when pickup_method changes
@@ -134,7 +134,15 @@ export default function BookingForms({ product, onClose, isAddToCart}) {
         });
     };
 
-    console.log(data);
+    const handleQuantityChange = (e) => {
+        const value = e.target.value;
+        const newQuantity = value === 0 ? 1 : parseInt(value);
+  
+        
+        if (!isNaN(newQuantity)) {
+            setData('quantity', Math.max(1, Math.min(newQuantity, product.stock)));
+        }
+    };
     
     return (
         <div>
@@ -144,7 +152,7 @@ export default function BookingForms({ product, onClose, isAddToCart}) {
                     <label>Nama</label>
                     <input 
                         type='text'
-                        value={auth.user.name}
+                        value={data.userName}
                         onChange={(e) => setData('userName', e.target.value)}
                         maxLength={25}
                         required
@@ -154,7 +162,7 @@ export default function BookingForms({ product, onClose, isAddToCart}) {
                     <label>Email</label>
                     <input 
                         type='email'
-                        value={auth.user.email}
+                        value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         required
                     />
@@ -163,7 +171,7 @@ export default function BookingForms({ product, onClose, isAddToCart}) {
                     <label>No Hp</label>
                     <input 
                         type='number'
-                        value={auth.user.phoneNumber}
+                        value={data.phoneNumber}
                         onChange={(e) => setData('phoneNumber', e.target.value)}
                         required
                     />
@@ -173,7 +181,7 @@ export default function BookingForms({ product, onClose, isAddToCart}) {
                     <input
                         type="number"
                         value={data.quantity}
-                        onChange={(e) => setData('quantity', parseInt(e.target.value))}
+                        onChange={handleQuantityChange}
                         min="1"
                         max={product.stock}
                     />

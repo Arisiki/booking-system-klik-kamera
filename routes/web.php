@@ -16,9 +16,9 @@ Route::get('/products/accecories', [ProductsController::class, 'showAccecories']
 Route::get('/products/{product}', [ProductsController::class, 'show'])->name('products.show');
 
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return Inertia::render('Dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -34,5 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [BookingController::class, 'checkout'])->name('checkout');
     Route::get('/checkout/{order}', [BookingController::class, 'showCheckout'])->name('checkout.show');
     Route::get('/products/{product}/check-availability', [BookingController::class, 'checkAvailability'])->name('products.checkAvailability');
+    Route::get('/orders', [BookingController::class, 'showOrders'])->name('orders.show');
+    Route::post('/orders/{order}/cancel', [BookingController::class, 'cancelOrder'])->name('orders.cancel');
+    Route::post('/orders/{order}/extend', [BookingController::class, 'extendOrder'])->name('orders.extend');
 });
 require __DIR__ . '/auth.php';

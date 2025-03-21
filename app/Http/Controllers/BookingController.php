@@ -58,6 +58,9 @@ class BookingController extends Controller
             'end_date' => 'required|date|after:start_date',
             'pickup_method' => 'required|in:pickup,cod',
             'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
+            'userName' => 'required|string|max:25',
+            'email' => 'required|email',
+            'phoneNumber' => 'required|numeric'
         ]);
 
         try {
@@ -67,7 +70,10 @@ class BookingController extends Controller
                 $request->start_date,
                 $request->end_date,
                 $request->pickup_method,
-                $request->pickupAddress
+                $request->pickupAddress,
+                $request->userName,
+                $request->email,
+                $request->phoneNumber,
             );
 
             return redirect()->route('cart.show')->with('success', 'Product added to cart!');
@@ -87,6 +93,9 @@ class BookingController extends Controller
             'end_date' => 'required|date|after:start_date',
             'pickup_method' => 'required|in:pickup,cod',
             'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
+            'userName' => 'required|string|max:25',
+            'email' => 'required|email',
+            'phoneNumber' => 'required|numeric'
         ]);
 
         // Cek ketersediaan
@@ -112,6 +121,9 @@ class BookingController extends Controller
             'address' => $request->pickupAddress,
             'total_cost' => $rentalCost,
             'status' => 'pending',
+            'user_name' => $request->userName,
+            'email' => $request->email,
+            'phone_number' => $request->phoneNumber
         ]);
 
         // Buat order item
@@ -158,6 +170,9 @@ class BookingController extends Controller
             'end_date' => collect($cartItems)->max('end_date'),
             'pickup_method' => $firstItem['pickup_method'],
             'address' => $firstItem['pickup_address'],
+            'user_name' => $firstItem['user_name'],
+            'email' => $firstItem['email'],
+            'phone_number' => $firstItem['phone_number'],
             'total_cost' => collect($cartItems)->sum('rental_cost'),
             'status' => 'pending',
         ]);
@@ -207,9 +222,9 @@ class BookingController extends Controller
                 'gross_amount' => $order->total_cost,
             ),
             'customer_details' => array(
-                'first_name' => auth()->user()->name,
-                'email' => auth()->user()->email,
-                'phone' => '08111222333',
+                'first_name' => $order->user_name,
+                'email' => $order->email,
+                'phone' => $order->phone_number,
             ),
             'item_details' => $itemDetails
 
@@ -218,7 +233,6 @@ class BookingController extends Controller
 
         return Inertia::render('Bookings/Checkout', [
             'order' => $order,
-            'clientKey' => config('mitrands.clientKey'),
             'snapToken' => $snapToken,
         ]);
     }
@@ -241,5 +255,90 @@ class BookingController extends Controller
             ->all();
 
         return $bookedRanges;
+    }
+
+
+
+    /**
+     * Tampilkan halaman orders
+     */
+    public function showOrders()
+    {
+        $orders = Order::where('user_id', auth()->id())
+            ->with('orderItems.product')
+            ->orderBy('order_date', 'desc')
+            ->get();
+
+        return Inertia::render('Bookings/Orders', [
+            'orders' => $orders,
+        ]);
+    }
+
+    /**
+     * Batalkan order
+     */
+    public function cancelOrder(Request $request, Order $order)
+    {
+        if ($order->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($order->status !== 'pending') {
+            return response()->json(['error' => 'Only pending orders can be cancelled'], 400);
+        }
+
+        $order->update([
+            'status' => 'cancelled',
+        ]);
+
+        return redirect()->route('orders.show')->with('success', 'Order cancelled successfully!');
+    }
+
+    /**
+     * Perpanjang masa sewa order
+     */
+    public function extendOrder(Request $request, Order $order)
+    {
+        $request->validate([
+            'new_end_date' => 'required|date|after:end_date',
+        ]);
+
+        if ($order->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if (!in_array($order->status, ['processed', 'completed'])) {
+            return response()->json(['error' => 'Only processed or completed orders can be extended'], 400);
+        }
+
+        $newEndDate = Carbon::parse($request->new_end_date);
+        $currentEndDate = Carbon::parse($order->end_date);
+        $additionalDays = $currentEndDate->diffInDays($newEndDate);
+
+        // Cek ketersediaan produk untuk tanggal baru
+        $isAvailable = true;
+        foreach ($order->orderItems as $item) {
+            if (!$item->product->isAvailableForDates($order->end_date, $newEndDate)) {
+                $isAvailable = false;
+                break;
+            }
+        }
+
+        if (!$isAvailable) {
+            return response()->json(['error' => 'Product is not available for the selected dates'], 400);
+        }
+
+        // Hitung biaya tambahan
+        $additionalCost = 0;
+        foreach ($order->orderItems as $item) {
+            $additionalCost += $item->product->price_per_day * $item->quantity * $additionalDays;
+        }
+
+        $order->update([
+            'end_date' => $newEndDate,
+            'total_cost' => $order->total_cost + $additionalCost,
+        ]);
+
+        return redirect()->route('orders.show')->with('success', 'Order extended successfully!');
     }
 }
