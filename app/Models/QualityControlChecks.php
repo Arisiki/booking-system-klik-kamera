@@ -7,25 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class QualityControlChecks extends Model
 {
-    /** @use HasFactory<\Database\Factories\QualityControlChecksFactory> */
     use HasFactory;
 
     protected $fillable = [
         'order_id',
         'product_id',
-        'type',
-        'condition',
-        'is_damaged',
-        'checked_at',
+        'category',
+        'checked_by',
+        'check_date',
+        'results',
+        'status',
+        'notes',
     ];
 
     protected $casts = [
-        'type' => 'string', // ENUM('receipt', 'return', 'admin_return')
-        'is_damaged' => 'boolean',
-        'checked_at' => 'datetime',
+        'results' => 'array',
+        'check_date' => 'datetime',
     ];
 
-    //relations
     public function order()
     {
         return $this->belongsTo(Order::class);
@@ -34,5 +33,10 @@ class QualityControlChecks extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function checkedBy()
+    {
+        return $this->belongsTo(User::class, 'checked_by');
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QualityControlChecksController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -37,5 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [BookingController::class, 'showOrders'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [BookingController::class, 'cancelOrder'])->name('orders.cancel');
     Route::post('/orders/{order}/extend', [BookingController::class, 'extendOrder'])->name('orders.extend');
+    Route::post('/orders/{order}/review', [BookingController::class, 'submitReview'])->name('orders.review');
+    Route::get('/orders/{order}/qc', [QualityControlChecksController::class, 'showForm'])->name('qc.show');
+    Route::post('/orders/{order}/qc', [QualityControlChecksController::class, 'store'])->name('qc.store');
 });
 require __DIR__ . '/auth.php';

@@ -6,6 +6,7 @@ use App\Helpers\CartHelper;
 use App\Models\Order;
 use App\Models\OrderItems;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -271,7 +272,7 @@ class BookingController extends Controller
     public function showOrders()
     {
         $orders = Order::where('user_id', auth()->id())
-            ->with('orderItems.product')
+            ->with(['orderItems.product', 'review'])
             ->orderBy('order_date', 'desc')
             ->get();
 
@@ -284,7 +285,7 @@ class BookingController extends Controller
 
         // Ambil ulang data setelah update
         $orders = Order::where('user_id', auth()->id())
-            ->with('orderItems.product')
+            ->with(['orderItems.product', 'review'])
             ->orderBy('order_date', 'desc')
             ->get();
 
@@ -359,5 +360,41 @@ class BookingController extends Controller
         ]);
 
         return redirect()->route('orders.show')->with('success', 'Order extended successfully!');
+    }
+
+    /**
+     * Submit ulasan dan rating untuk order
+     */
+    public function submitReview(Request $request, Order $order)
+    {
+        $request->validate([
+            'rating' => 'required|integer|between:1,5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+
+        if ($order->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($order->status !== 'completed') {
+            return response()->json(['error' => 'You can only review completed orders'], 400);
+        }
+
+        if ($order->review) {
+            return response()->json(['error' => 'You have already reviewed this order'], 400);
+        }
+
+        $productId = $order->orderItems->first()->product_id;
+
+        $review = Review::create([
+            'user_id' => auth()->id(),
+            'order_id' => $order->id,
+            'product_id' => $productId,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
+
+        return redirect()->route('orders.show')->with('success', 'Review submitted successfully!');
     }
 }

@@ -7,31 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
-    /** @use HasFactory<\Database\Factories\ReviewsFactory> */
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'product_id',
         'order_id',
+        'product_id',
         'rating',
         'comment',
-        'image_path'
     ];
 
-    protected $casts = [
-        'rating' => 'integer'
-    ];
-
-    //relations
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
     }
 
     public function order()
@@ -39,8 +27,8 @@ class Review extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function images()
+    public function product()
     {
-        return $this->hasMany(Image::class);
+        return $this->belongsTo(Product::class);
     }
 }
