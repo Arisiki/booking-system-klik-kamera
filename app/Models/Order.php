@@ -27,9 +27,9 @@ class Order extends Model
         'order_date' => 'datetime',
         'start_date' => 'date',
         'end_date' => 'date',
-        'pickup_method' => 'string', // ENUM('pickup', 'cod')
+        'pickup_method' => 'string',
         'total_cost' => 'decimal:2',
-        'status' => 'string', // ENUM('pending', 'processed', 'completed', 'cancelled')
+        'status' => 'string',
     ];
 
     //relations

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('end_date');
             $table->enum('pickup_method', ['pickup', 'cod']);
             $table->decimal('total_cost', 10, 2);
-            $table->enum('status', ['pending', 'processed', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'booked', 'awaiting return', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }

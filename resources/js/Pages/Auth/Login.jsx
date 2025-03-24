@@ -77,10 +77,11 @@ export default function Login({ status, canResetPassword }) {
                         <span className="ms-2 text-sm text-gray-600">
                             Remember me
                         </span>
+                        
                     </label>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                <div className="mt-4 flex gap-2 items-center justify-end">
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
@@ -89,6 +90,13 @@ export default function Login({ status, canResetPassword }) {
                             Forgot your password?
                         </Link>
                     )}
+                    <Link
+                        href={route('register')}
+                        className="rounded-md text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                        Create new Account
+                    </Link>
+
 
                     <PrimaryButton className="ms-4" disabled={processing}>
                         Log in

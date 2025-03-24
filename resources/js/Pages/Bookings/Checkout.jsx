@@ -4,12 +4,11 @@ import { router, usePage } from '@inertiajs/react';
 export default function Checkout() {
     const { order, snapToken } = usePage().props;
     const [isSnapReady, setIsSnapReady] = useState(false);
-    const [isPopupOpen, setIsPopupOpen] = useState(false); // State untuk melacak apakah popup sudah terbuka
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     console.log(order);
 
     useEffect(() => {
-        // Cek apakah window.snap tersedia
         const checkSnap = setInterval(() => {
             if (window.snap) {
                 setIsSnapReady(true);
@@ -19,7 +18,6 @@ export default function Checkout() {
 
         return () => {
             clearInterval(checkSnap);
-            // Tutup popup jika ada saat komponen di-unmount
             if (window.snap) {
                 window.snap.hide();
             }
@@ -28,26 +26,26 @@ export default function Checkout() {
 
     const handlePayment = () => {
         if (isSnapReady && window.snap && !isPopupOpen) {
-            setIsPopupOpen(true); // Tandai bahwa popup sudah terbuka
+            setIsPopupOpen(true);
             window.snap.embed(snapToken, {
                 embedId: 'snap-container',
                 onSuccess: function (result) {
                     alert('Payment Success');
-                    setIsPopupOpen(false); // Reset state setelah sukses
-                    router.visit('/orders');
+                    setIsPopupOpen(false);
+                    router.visit('/orders', { preserveState: false });
                 },
                 onError: function (result) {
                     alert('Payment failed');
                     console.log(result);
-                    setIsPopupOpen(false); // Reset state setelah gagal
+                    setIsPopupOpen(false);
                 },
                 onPending: function (result) {
                     alert('Waiting for your Payment...');
-                    setIsPopupOpen(false); // Reset state setelah pending
-                    router.visit('/orders');
+                    setIsPopupOpen(false);
+                    router.visit('/orders', { preserveState: false });
                 },
                 onClose: function () {
-                    setIsPopupOpen(false); // Reset state saat popup ditutup
+                    setIsPopupOpen(false);
                 },
             });
         } else if (!isSnapReady) {
@@ -62,7 +60,7 @@ export default function Checkout() {
                 handlePayment();
             }, 500);
         }
-    }, [isSnapReady, snapToken, isPopupOpen]); // Tambah isPopupOpen ke dependencies
+    }, [isSnapReady, snapToken, isPopupOpen]);
 
     return (
         <div className="flex gap-2">

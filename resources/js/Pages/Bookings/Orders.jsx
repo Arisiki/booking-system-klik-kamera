@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import Navbar from '@/Layouts/Navbar';
+import BookingForms from './BookingForms';
 
 export default function Orders() {
+    const [showBookingForm, setShowBookingForm] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+
+
     const { orders } = usePage().props;
+    console.log(orders);
+    
+
+    useEffect(() => {
+        router.reload({ only: ['orders'] });
+    }, []);
 
     const handleCancelOrder = (orderId) => {
         if (confirm('Are you sure you want to cancel this order?')) {
             router.post(`/orders/${orderId}/cancel`, {}, {
                 onSuccess: () => {
                     alert('Order cancelled successfully!');
+                    router.reload({ only: ['orders'] });
                 },
                 onError: (errors) => {
                     alert('Failed to cancel order: ' + (errors.error || 'Unknown error'));
@@ -18,18 +31,15 @@ export default function Orders() {
         }
     };
 
-    const handleExtendOrder = (orderId) => {
-        const newEndDate = prompt('Enter new end date (YYYY-MM-DD):');
-        if (newEndDate) {
-            router.post(`/orders/${orderId}/extend`, { new_end_date: newEndDate }, {
-                onSuccess: () => {
-                    alert('Order extended successfully!');
-                },
-                onError: (errors) => {
-                    alert('Failed to extend order: ' + (errors.error || 'Unknown error'));
-                },
-            });
-        }
+    const handleExtendOrder = (product, order, item) => {
+        setSelectedProduct(product);
+        setSelectedOrder({ order, item });
+        setShowBookingForm(true);
+    };
+    const handleCloseForm = () => {
+        setShowBookingForm(false);
+        setSelectedProduct(null);
+        setSelectedOrder(null)
     };
 
     return (
@@ -53,32 +63,63 @@ export default function Orders() {
                         <tbody>
                             {orders.map((order) => (
                                 <tr key={order.id}>
+                                    
                                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.id}</td>
                                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                         {order.order_items.map((item) => (
                                             <div key={item.id}>{item.product.name} (Qty: {item.quantity})</div>
                                         ))}
                                     </td>
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.start_date}</td>
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.end_date}</td>
-                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>Rp {order.total_cost}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                        {new Date(order.start_date).toLocaleDateString('id-ID', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric',
+                                        })}
+                                    </td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                        {new Date(order.end_date).toLocaleDateString('id-ID', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric',
+                                        })}
+                                    </td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                        Rp {order.total_cost}
+                                    </td>
                                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.status}</td>
                                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                         {order.status === 'pending' && (
                                             <button
                                                 onClick={() => handleCancelOrder(order.id)}
-                                                style={{ marginRight: '10px', backgroundColor: 'red', color: 'white', padding: '5px 10px', border: 'none', cursor: 'pointer' }}
+                                                style={{
+                                                    marginRight: '10px',
+                                                    backgroundColor: 'red',
+                                                    color: 'white',
+                                                    padding: '5px 10px',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                }}
                                             >
                                                 Cancel
                                             </button>
                                         )}
-                                        {(order.status === 'processed' || order.status === 'completed') && (
-                                            <button
-                                                onClick={() => handleExtendOrder(order.id)}
-                                                style={{ backgroundColor: 'green', color: 'white', padding: '5px 10px', border: 'none', cursor: 'pointer' }}
-                                            >
-                                                Extend
-                                            </button>
+                                        {order.status === 'booked' && (
+                                            order.order_items.map((item) => (
+                                                <button
+                                                    key={order.id}
+                                                    onClick={() => handleExtendOrder(item.product, order, item)}
+                                                    style={{
+                                                        backgroundColor: 'green',
+                                                        color: 'white',
+                                                        padding: '5px 10px',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                    }}
+                                                >
+                                                    Extend
+                                                </button>
+                                            ))
                                         )}
                                     </td>
                                 </tr>
@@ -89,6 +130,17 @@ export default function Orders() {
             ) : (
                 <p>You have no orders yet.</p>
             )}
+            {showBookingForm && selectedProduct && selectedOrder && (
+                <BookingForms
+                    product={selectedProduct}
+                    onClose={handleCloseForm}
+                    isAddToCart={false}
+                    phoneNumber={selectedOrder.order.phone_number}
+                    quantity={selectedOrder.item.quantity}
+                    extendAddress={selectedOrder.order.address}
+                    isExtend={true}
+                />
+            )}
         </div>
     );
-}
+} 

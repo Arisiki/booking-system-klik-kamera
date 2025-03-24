@@ -7,7 +7,7 @@ import { format, parse, addDays, eachDayOfInterval } from 'date-fns';
 import MapPicker from '@/Components/MapPicker';
 import { address } from '@/data';
 
-export default function BookingForms({ product, onClose, isAddToCart}) {
+export default function BookingForms({ product, onClose, isAddToCart, phoneNumber, quantity, isExtend = false, extendAddress}) {
     const {auth} = usePage().props;
     const [unavailableDates, setUnavailableDates] = useState([]);
     const [dateError, setDateError] = useState('');
@@ -19,14 +19,14 @@ export default function BookingForms({ product, onClose, isAddToCart}) {
     
 
     const { data, setData, post, processing, errors } = useForm({
-        quantity: 1,
+        quantity: quantity || 1,
         start_date: format(new Date(), 'yyyy-MM-dd'),
         end_date: format(new Date(), 'yyyy-MM-dd'),
         pickup_method: 'pickup',
-        pickupAddress: address && address.length > 0 ? address[0].value : '',
+        pickupAddress: isExtend ? extendAddress : address && address.length > 0 ? address[0].value : '',
         userName: auth.user.name || '',
         email: auth.user.email || '',
-        phoneNumber: auth.user.phoneNumber || ''
+        phoneNumber: phoneNumber || ''
     });
 
     // Update pickupAddress when pickup_method changes
@@ -201,58 +201,63 @@ export default function BookingForms({ product, onClose, isAddToCart}) {
                     {errors.end_date && <span>{errors.end_date}</span>}
                 </div>
                 
-                <div>
-                    <label>Pickup Method:</label>
+                {!isExtend && (
                     <div>
-                        <label>
-                            <input
-                                type="radio"
-                                value="pickup"
-                                checked={data.pickup_method === 'pickup'}
-                                onChange={() => setData('pickup_method', 'pickup')}
-                            />
-                            Pickup
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                value="cod"
-                                checked={data.pickup_method === 'cod'}
-                                onChange={() => setData('pickup_method', 'cod')}
-                            />
-                            COD (Cash on Delivery)
-                        </label>
-                    </div>
-                    {errors.pickup_method && <span>{errors.pickup_method}</span>}
-                </div>
-
-                {/* Address selection section */}
-                {data.pickup_method === 'pickup' ? (
-                    <div>
-                        <label>
-                            Pilih Alamat:
-                            <select
-                                value={data.pickupAddress}
-                                onChange={(e) => setData('pickupAddress', e.target.value)}
-                            >
-                                {address.map((addr, index) => (
-                                    <option key={index} value={addr.value}>
-                                        {addr.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                        {errors.pickupAddress && <span>{errors.pickupAddress}</span>}
-                    </div>
-                ) : (
-                    <div>
-                        <MapPicker 
-                            onAddressSelect={handleAddressSelect} 
-                            initialAddress={data.pickupAddress} 
-                        />
-                        {errors.pickupAddress && <span>{errors.pickupAddress}</span>}
+                        <label>Pickup Method:</label>
+                        <div>
+                            <label>
+                                <input
+                                    type="radio"
+                                    value="pickup"
+                                    checked={data.pickup_method === 'pickup'}
+                                    onChange={() => setData('pickup_method', 'pickup')}
+                                />
+                                Pickup
+                            </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    value="cod"
+                                    checked={data.pickup_method === 'cod'}
+                                    onChange={() => setData('pickup_method', 'cod')}
+                                />
+                                COD (Cash on Delivery)
+                            </label>
+                        </div>
+                        {errors.pickup_method && <span>{errors.pickup_method}</span>}
                     </div>
                 )}
+
+                {/* Address selection section */}
+                {!isExtend && (
+                     data.pickup_method === 'pickup' ? (
+                        <div>
+                            <label>
+                                Pilih Alamat:
+                                <select
+                                    value={data.pickupAddress}
+                                    onChange={(e) => setData('pickupAddress', e.target.value)}
+                                >
+                                    {address.map((addr, index) => (
+                                        <option key={index} value={addr.value}>
+                                            {addr.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            {errors.pickupAddress && <span>{errors.pickupAddress}</span>}
+                        </div>
+                    ) : (
+                        <div>
+                            <MapPicker 
+                                onAddressSelect={handleAddressSelect} 
+                                initialAddress={data.pickupAddress} 
+                            />
+                            {errors.pickupAddress && <span>{errors.pickupAddress}</span>}
+                        </div>
+                    )
+                )}
+               
                 
                 <button type="submit" disabled={processing || dateError}>
                     {isAddToCart ? 'Add to Cart' : 'Book Now'}

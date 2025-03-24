@@ -10,7 +10,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\FacadesLog;
 use Inertia\Inertia;
+
 
 class BookingController extends Controller
 {
@@ -42,7 +45,7 @@ class BookingController extends Controller
                 'unavailable_dates' => $this->getUnavailableDates($product),
             ]);
         } catch (\Exception $e) {
-            \Log::error('Check Availability Error: ' . $e->getMessage());
+            Log::error('Check Availability Error: ' . $e->getMessage());
             return response()->json(['error' => 'Internal server error: ' . $e->getMessage()], 500);
         }
     }
@@ -132,6 +135,8 @@ class BookingController extends Controller
             'product_id' => $product->id,
             'quantity' => $request->quantity,
             'rental_cost' => $rentalCost,
+            'address' => $request->pickupAddress,
+            'pickup_method' => $request->pickup_method
         ]);
 
         return redirect()->route('checkout.show', $order->id)->with('success', 'Order created successfully!');
@@ -237,6 +242,7 @@ class BookingController extends Controller
         ]);
     }
 
+
     /**
      * Helper untuk mendapatkan tanggal yang tidak tersedia
      */
@@ -264,6 +270,19 @@ class BookingController extends Controller
      */
     public function showOrders()
     {
+        $orders = Order::where('user_id', auth()->id())
+            ->with('orderItems.product')
+            ->orderBy('order_date', 'desc')
+            ->get();
+
+        // Cek apakah masa booking telah selesai
+        foreach ($orders as $order) {
+            if ($order->status == 'Booked' && Carbon::parse($order->end_date)->isPast()) {
+                $order->update(['status' => 'Being returned']);
+            }
+        }
+
+        // Ambil ulang data setelah update
         $orders = Order::where('user_id', auth()->id())
             ->with('orderItems.product')
             ->orderBy('order_date', 'desc')

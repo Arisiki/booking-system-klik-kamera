@@ -1,7 +1,9 @@
 import NavLink from '@/Components/NavLink'
+import { usePage } from '@inertiajs/react';
 import React from 'react'
 
 const Navbar = () => {
+  const user = usePage().props.auth.user;
   const navData = [
     {
       name: 'Beranda',
@@ -40,6 +42,12 @@ const Navbar = () => {
       >
         Cart
       </NavLink>
+      {user && (
+        <NavLink
+        href='/profile'>
+          Profile
+        </NavLink>
+      )}
     </div>
   )
 }

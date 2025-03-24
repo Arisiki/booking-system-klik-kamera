@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePage, useForm, router } from '@inertiajs/react';
+import { usePage, useForm, router, Link } from '@inertiajs/react';
 import Navbar from '@/Layouts/Navbar';
 
 export default function Cart() {
@@ -24,6 +24,9 @@ export default function Cart() {
     return (
         <div>
             <Navbar />
+            <Link href='/orders' className='px-3 py-2 border'>
+                My Order
+            </Link>
             <h1>Shopping Cart</h1>
             {cartItems.length > 0 ? (
                 <div>
