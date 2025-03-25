@@ -11,7 +11,6 @@ class CartHelper
   {
     $product = Product::findOrFail($productId);
 
-    // Validasi ketersediaan
     if (!$product->isAvailableForDates($startDate, $endDate)) {
       throw new \Exception('Product is not available for the selected dates.');
     }
@@ -20,14 +19,11 @@ class CartHelper
       throw new \Exception('Requested quantity exceeds available stock.');
     }
 
-    // Hitung rental cost
     $days = Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate)) + 1;
     $rentalCost = $product->price_per_day * $quantity * $days;
 
-    // Ambil cart dari session
     $cart = session()->get('cart', []);
 
-    // Tambah atau update item di cart
     $cart[$productId] = [
       'product_id' => $productId,
       'quantity' => $quantity,
@@ -41,7 +37,6 @@ class CartHelper
       'phone_number' => $phoneNumber
     ];
 
-    // Simpan kembali ke session
     session()->put('cart', $cart);
 
     return true;

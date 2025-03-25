@@ -28,7 +28,7 @@ const Navbar = () => {
   ]
 
   return (
-    <div>
+    <nav className='flex justify-around'>
       {navData.map((nav) => (
         <NavLink
           key={nav.name}
@@ -37,18 +37,35 @@ const Navbar = () => {
           {nav.name}
         </NavLink>
       ))}
+
       <NavLink
         href='/cart'
       >
         Cart
       </NavLink>
-      {user && (
+
+
+      {!user ? (
+        <div>
+          <NavLink
+            href='/login'
+          >
+            Login
+          </NavLink>
+          <NavLink
+            href='/register'
+          >
+            Register
+          </NavLink>
+        </div>
+      ) : (
         <NavLink
-        href='/profile'>
+          href='/profile'
+        >
           Profile
         </NavLink>
       )}
-    </div>
+    </nav>
   )
 }
 

@@ -3,6 +3,7 @@ import { usePage, router } from '@inertiajs/react';
 import Navbar from '@/Layouts/Navbar';
 import BookingForms from './BookingForms';
 import ReviewForm from '@/Components/ReviewForm';
+import Countdown from 'react-countdown'; 
 
 export default function Orders() {
     const [showBookingForm, setShowBookingForm] = useState(false);
@@ -41,6 +42,18 @@ export default function Orders() {
         setShowBookingForm(false);
         setSelectedProduct(null);
         setSelectedOrder(null);
+    };
+
+  
+    const renderer = ({ hours, minutes, seconds, completed }) => {
+        if (completed) {
+            return <span className="text-red-500 text-sm">Order has expired</span>;
+        }
+        return (
+            <span className="text-yellow-500 text-sm">
+                Expires in: {hours}h {minutes}m {seconds}s
+            </span>
+        );
     };
 
     return (
@@ -88,19 +101,22 @@ export default function Orders() {
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             Rp {order.total_cost}
                                         </td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.status}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                            {order.status}
+                                            {order.status === 'pending' && order.expires_at && (
+                                                <div className="mt-1">
+                                                    <Countdown
+                                                        date={new Date(order.expires_at)}
+                                                        renderer={renderer}
+                                                    />
+                                                </div>
+                                            )}
+                                        </td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             {order.status === 'pending' && (
                                                 <button
                                                     onClick={() => handleCancelOrder(order.id)}
-                                                    style={{
-                                                        marginRight: '10px',
-                                                        backgroundColor: 'red',
-                                                        color: 'white',
-                                                        padding: '5px 10px',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                    }}
+                                                    className="bg-red-500 text-white px-3 py-1 rounded mr-2"
                                                 >
                                                     Cancel
                                                 </button>
@@ -108,14 +124,7 @@ export default function Orders() {
                                             {order.status === 'payment_complete' && (
                                                 <button
                                                     onClick={() => router.visit(`/orders/${order.id}/qc`)}
-                                                    style={{
-                                                        marginRight: '10px',
-                                                        backgroundColor: 'orange',
-                                                        color: 'white',
-                                                        padding: '5px 10px',
-                                                        border: 'none',
-                                                        cursor: 'pointer',
-                                                    }}
+                                                    className="bg-orange-500 text-white px-3 py-1 rounded mr-2"
                                                 >
                                                     Isi QC
                                                 </button>
@@ -125,13 +134,7 @@ export default function Orders() {
                                                     <button
                                                         key={item.id}
                                                         onClick={() => handleExtendOrder(item.product, order, item)}
-                                                        style={{
-                                                            backgroundColor: 'green',
-                                                            color: 'white',
-                                                            padding: '5px 10px',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                        }}
+                                                        className="bg-green-500 text-white px-3 py-1 rounded mr-2"
                                                     >
                                                         Extend
                                                     </button>
@@ -142,13 +145,7 @@ export default function Orders() {
                                                     <button
                                                         key={item.id}
                                                         onClick={() => setReview(true)}
-                                                        style={{
-                                                            backgroundColor: 'blueviolet',
-                                                            color: 'white',
-                                                            padding: '5px 10px',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                        }}
+                                                        className="bg-blue-600 text-white px-3 py-1 rounded"
                                                     >
                                                         Tambahkan Review
                                                     </button>

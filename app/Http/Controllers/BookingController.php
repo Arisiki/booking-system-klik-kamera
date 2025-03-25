@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CartHelper;
+use App\Mail\OrderCancelledNotification;
 use App\Models\Order;
 use App\Models\OrderItems;
 use App\Models\Product;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\FacadesLog;
 use Inertia\Inertia;
 
@@ -215,9 +217,8 @@ class BookingController extends Controller
             ];
         }
 
-
         // Payment Gateway (Midtrans)
-        \Midtrans\Config::$serverKey = config('mitrands.serverKey');
+        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
         \Midtrans\Config::$isProduction = false;
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
@@ -241,6 +242,103 @@ class BookingController extends Controller
             'order' => $order,
             'snapToken' => $snapToken,
         ]);
+    }
+
+    /**
+     * Mitrands notification for automatic payment confirmation
+     */
+
+    /**
+     * Midtrans notification for automatic payment confirmation
+     */
+    public function handleMidtransNotification(Request $request)
+    {
+        Log::info('Midtrans Notification Received', [
+            'method' => $request->method(),
+            'payload' => $request->all(),
+            'headers' => $request->headers->all(),
+        ]);
+
+        try {
+            $serverKey = config('midtrans.serverKey');
+            if (empty($serverKey)) {
+                throw new \Exception('Midtrans server key is not set in configuration');
+            }
+
+            \Midtrans\Config::$serverKey = $serverKey;
+            \Midtrans\Config::$isProduction = false;
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
+
+            try {
+                $notification = new \Midtrans\Notification();
+                Log::info('Midtrans Notification Created', ['notification' => (array) $notification]);
+            } catch (\Exception $e) {
+                Log::error('Failed to verify Midtrans notification', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                return response()->json(['status' => 'error', 'message' => 'Failed to verify transaction'], 400);
+            }
+
+            $signatureKey = $notification->signature_key;
+            $orderId = $notification->order_id;
+            $statusCode = $notification->status_code;
+            $grossAmount = $notification->gross_amount;
+            $mySignature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+
+            if ($signatureKey !== $mySignature) {
+                Log::warning('Invalid signature', ['signature_key' => $signatureKey, 'my_signature' => $mySignature]);
+                return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 403);
+            }
+
+            $transactionStatus = $notification->transaction_status;
+            $orderIdParts = explode('-', $notification->order_id);
+            $orderId = null;
+
+            if (!empty($orderIdParts) && is_numeric($orderIdParts[0])) {
+                $orderId = $orderIdParts[0];
+            }
+
+            if (!$orderId) {
+                Log::warning('Invalid order_id format', ['order_id' => $notification->order_id]);
+                return response()->json(['status' => 'error', 'message' => 'Invalid order_id format'], 400);
+            }
+
+            Log::info('Parsed order_id', ['order_id' => $orderId]);
+
+            $order = Order::find($orderId);
+
+            if (!$order) {
+                Log::warning('Order not found', ['order_id' => $orderId]);
+                return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+            }
+
+
+            if ($transactionStatus == 'pending') {
+                $order->update([
+                    'status' => 'pending_payment',
+                ]);
+            } elseif ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
+                $order->update([
+                    'status' => 'payment_complete',
+                ]);
+            } elseif ($transactionStatus == 'expire' || $transactionStatus == 'cancel' || $transactionStatus == 'deny') {
+                Mail::to($order->email)->send(new OrderCancelledNotification($order));
+
+                $order->orderItems()->delete();
+                $order->delete();
+                Log::info('Order cancelled and deleted', ['order_id' => $orderId]);
+            }
+
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            Log::error('Error handling Midtrans notification', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['status' => 'error', 'message' => 'Internal server error'], 500);
+        }
     }
 
 
@@ -281,13 +379,23 @@ class BookingController extends Controller
             if ($order->status == 'Booked' && Carbon::parse($order->end_date)->isPast()) {
                 $order->update(['status' => 'Being returned']);
             }
+
+            // Tambah informasi expires_at untuk order pending
+            if ($order->status == 'pending') {
+                $order->expires_at = Carbon::parse($order->order_date)->addHours(3);
+            }
         }
 
-        // Ambil ulang data setelah update
         $orders = Order::where('user_id', auth()->id())
             ->with(['orderItems.product', 'review'])
             ->orderBy('order_date', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($order) {
+                if ($order->status == 'pending') {
+                    $order->expires_at = Carbon::parse($order->order_date)->addHours(3);
+                }
+                return $order;
+            });
 
         return Inertia::render('Bookings/Orders', [
             'orders' => $orders,

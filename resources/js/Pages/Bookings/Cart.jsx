@@ -6,10 +6,7 @@ export default function Cart() {
     const { cartItems, totalCost, auth } = usePage().props;
     const { post, processing, data, setData } = useForm({
         userName: auth.user.name
-    });
-
-    console.log(cartItems);
-    
+    }); 
 
     const handleCheckout = () => {
         post(route('checkout'), {
