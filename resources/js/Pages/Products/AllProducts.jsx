@@ -29,7 +29,7 @@
         
 
         return (
-            <div className="container">
+            <section>
                 <Head title='Products'/>
                 <Navbar/>
                 <h1>Semua Products</h1>
@@ -86,7 +86,6 @@
                             </label>
                         ))}
                     </div>
-        
 
                     <div>
                         <h3>Merek</h3>
@@ -149,6 +148,6 @@
                         isAddToCart={isAddToCart}
                     />
                 )}
-            </div>
+            </section>
         );
     }

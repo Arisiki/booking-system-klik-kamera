@@ -23,7 +23,7 @@ class OrderItemsFactory extends Factory
             'product_id' => Product::factory(),
             'quantity' => $this->faker->numberBetween(1, 3),
             'address' => fake()->text(100),
-            'pickup_method' => fake()->randomElement(['pickup', 'cod']),
+            'pickup_method' => fake()->randomElement(['pickup', 'home_delivery']),
             'rental_cost' => $this->faker->randomFloat(2, 50000, 200000),
         ];
     }

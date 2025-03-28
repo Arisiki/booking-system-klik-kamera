@@ -21,9 +21,9 @@ class UpdateOrdersTableAddPaymentCompleteStatus extends Migration
             ])->default('pending')->change();
         });
 
-        // Ubah status 'Booked' yang sudah ada menjadi 'payment_complete'
+        // Ubah status 'booked' yang sudah ada menjadi 'payment_complete'
         DB::table('orders')
-            ->where('status', 'Booked')
+            ->where('status', 'booked')
             ->update(['status' => 'payment_complete']);
     }
 
@@ -34,9 +34,9 @@ class UpdateOrdersTableAddPaymentCompleteStatus extends Migration
             $table->string('status')->default('pending')->change();
         });
 
-        // Kembalikan status 'payment_complete' ke 'Booked'
+        // Kembalikan status 'payment_complete' ke 'booked'
         DB::table('orders')
             ->where('status', 'payment_complete')
-            ->update(['status' => 'Booked']);
+            ->update(['status' => 'booked']);
     }
 }

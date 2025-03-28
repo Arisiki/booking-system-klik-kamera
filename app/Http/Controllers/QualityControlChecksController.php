@@ -254,8 +254,8 @@ class QualityControlChecksController extends Controller
             ]);
         }
 
-        // Langsung ubah status order menjadi Booked
-        $order->update(['status' => 'Booked']);
+        // Langsung ubah status order menjadi booked
+        $order->update(['status' => 'booked']);
 
         return redirect()->route('orders.show')->with('success', 'QC submitted successfully!');
     }

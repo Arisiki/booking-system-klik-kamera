@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+@layer components {
+  .section-container {
+    max-width: 1440px;
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+
+
+  @media screen and (max-width:640px) {
+    .section-container{
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+  }
+}
+
+
+
+

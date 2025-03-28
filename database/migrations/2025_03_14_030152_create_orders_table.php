@@ -17,7 +17,7 @@ return new class extends Migration
             $table->dateTime('order_date');
             $table->date('start_date');
             $table->date('end_date');
-            $table->enum('pickup_method', ['pickup', 'cod']);
+            $table->enum('pickup_method', ['pickup', 'home_delivery']);
             $table->decimal('total_cost', 10, 2);
             $table->enum('status', ['pending', 'booked', 'awaiting return', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();

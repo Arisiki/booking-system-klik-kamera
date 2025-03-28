@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CartHelper;
+use App\Jobs\CancelOrderJob;
 use App\Mail\OrderCancelledNotification;
 use App\Models\Order;
 use App\Models\OrderItems;
@@ -62,7 +63,7 @@ class BookingController extends Controller
             'quantity' => 'required|integer|min:1',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
-            'pickup_method' => 'required|in:pickup,cod',
+            'pickup_method' => 'required|in:pickup,home_delivery',
             'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
             'userName' => 'required|string|max:25',
             'email' => 'required|email',
@@ -97,7 +98,7 @@ class BookingController extends Controller
             'quantity' => 'required|integer|min:1',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
-            'pickup_method' => 'required|in:pickup,cod',
+            'pickup_method' => 'required|in:pickup,home_delivery',
             'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
             'userName' => 'required|string|max:25',
             'email' => 'required|email',
@@ -141,6 +142,8 @@ class BookingController extends Controller
             'address' => $request->pickupAddress,
             'pickup_method' => $request->pickup_method
         ]);
+
+        CancelOrderJob::dispatch($order->id)->delay(now()->addHour(3));
 
         return redirect()->route('checkout.show', $order->id)->with('success', 'Order created successfully!');
     }
@@ -196,6 +199,8 @@ class BookingController extends Controller
             ]);
         }
 
+        CancelOrderJob::dispatch($order->id)->delay(now()->addHour(3));
+
         CartHelper::clearCart();
 
         return redirect()->route('checkout.show', $order->id)->with('success', 'Order created successfully!');
@@ -244,9 +249,6 @@ class BookingController extends Controller
         ]);
     }
 
-    /**
-     * Mitrands notification for automatic payment confirmation
-     */
 
     /**
      * Midtrans notification for automatic payment confirmation
@@ -327,8 +329,8 @@ class BookingController extends Controller
                 Mail::to($order->email)->send(new OrderCancelledNotification($order));
 
                 $order->orderItems()->delete();
-                $order->delete();
-                Log::info('Order cancelled and deleted', ['order_id' => $orderId]);
+                $order->update(['status' => 'cancelled']);
+                Log::info('Order cancelled due to Midtrans notification', ['order_id' => $orderId]);
             }
 
             return response()->json(['status' => 'success']);
@@ -372,28 +374,18 @@ class BookingController extends Controller
         $orders = Order::where('user_id', auth()->id())
             ->with(['orderItems.product', 'review'])
             ->orderBy('order_date', 'desc')
-            ->get();
-
-        // Cek apakah masa booking telah selesai
-        foreach ($orders as $order) {
-            if ($order->status == 'Booked' && Carbon::parse($order->end_date)->isPast()) {
-                $order->update(['status' => 'Being returned']);
-            }
-
-            // Tambah informasi expires_at untuk order pending
-            if ($order->status == 'pending') {
-                $order->expires_at = Carbon::parse($order->order_date)->addHours(3);
-            }
-        }
-
-        $orders = Order::where('user_id', auth()->id())
-            ->with(['orderItems.product', 'review'])
-            ->orderBy('order_date', 'desc')
             ->get()
             ->map(function ($order) {
-                if ($order->status == 'pending') {
-                    $order->expires_at = Carbon::parse($order->order_date)->addHours(3);
+                // Cek apakah masa booking telah selesai
+                if ($order->status == 'booked' && Carbon::parse($order->end_date)->isPast()) {
+                    $order->update(['status' => 'Being returned']);
+                    $order->status = 'Being returned';
                 }
+
+                if (in_array($order->status, ['pending', 'pending_payment'])) {
+                    $order->expires_at = Carbon::parse($order->order_date)->addHour(3);
+                }
+
                 return $order;
             });
 
