@@ -25,7 +25,10 @@ export default {
             
         },
         screens: {
-            'md' : '800px'
+            'minitab' : '600px',
+            'md' : '800px',
+            'laptop' : '1280px',
+            'lg' : '1440px'
         }
     },
 

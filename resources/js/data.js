@@ -26,6 +26,22 @@ export const icons =
     profile: {
       name: 'profile-icon',
       path: '/icons/Profile.svg'
+    },
+    filter: {
+      name: 'filter-icon',
+      path: '/icons/Filter.svg'
+    },
+    arrowUp: {
+      name: 'arrow-up-icon',
+      path: 'icons/ArrowUp.svg'
+    },
+    addCart: {
+      name: 'add-cart-icon',
+      path: '/icons/addCart.svg'
+    },
+    bestPick: {
+      name: 'best-pick-icon',
+      path: '/icons/BestPick.svg'
     }
   }
 

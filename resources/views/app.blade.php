@@ -19,7 +19,7 @@
             window.googleMapsApiKey = "{{ config('services.googleMapsApiKey') }}";
         </script>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased flex justify-center items-center">
         @inertia
     </body>
 </html>

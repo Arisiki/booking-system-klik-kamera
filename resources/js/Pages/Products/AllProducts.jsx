@@ -1,119 +1,87 @@
-    import React, { useState } from 'react';
-    import { usePage, router, Head } from '@inertiajs/react';
-    import BookingForms from '../Bookings/BookingForms';
-    import Navbar from '@/Layouts/Navbar';
+import React, { useEffect, useState } from 'react';
+import { usePage, router, Head, Link } from '@inertiajs/react';
+import BookingForms from '../Bookings/BookingForms';
+import Navbar from '@/Layouts/Navbar';
+import Sidebar from '@/Components/Sidebar';
+import Footer from '@/Layouts/Footer';
+import { icons } from '@/data';
+import CardProduct from '@/Components/CardProduct';
 
 
-    export default function AllProducts() {
-        const { products, filters, categories, cameraTypes, brands } = usePage().props;
-        const [showBookingForm, setShowBookingForm] = useState(false);
-        const [selectedProduct, setSelectedProduct] = useState(null);
-        const [isAddToCart, setIsAddToCart] = useState(false);
+export default function AllProducts() {
+    const { products, filters, categories, cameraTypes, brands } = usePage().props;
+    const [showBookingForm, setShowBookingForm] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isAddToCart, setIsAddToCart] = useState(false);
 
-        const handleFilterChange = (key, value) => {
-            router.get('/products', { ...filters, [key]: value }, { preserveState: true });
+    const handleFilterChange = (key, value) => {
+        router.get('/products', { ...filters, [key]: value }, { preserveState: true });
+    };
+
+    const handleBooking = (product, addToCart = false) => {
+        setSelectedProduct(product);
+        setIsAddToCart(addToCart);
+        setShowBookingForm(true);
+    };
+
+    const handleCloseForm = () => {
+        setShowBookingForm(false);
+        setSelectedProduct(null);
+    };
+
+    const [filterOpen, setFilterOpen] = useState(false)
+
+    useEffect(() => {
+        const handleResize = () => {
+            if(window.innerWidth >= 1280) {
+                setFilterOpen(true)
+            } else {
+                setFilterOpen(false)
+            }
+        }
+
+        handleResize();
+
+        window.addEventListener('resize', handleResize)
+        return () => {
+            window.removeEventListener('resize', handleResize);
         };
+    }, [])
 
-        const handleBooking = (product, addToCart = false) => {
-            setSelectedProduct(product);
-            setIsAddToCart(addToCart);
-            setShowBookingForm(true);
-        };
+    console.log(filterOpen);
+    
 
-        const handleCloseForm = () => {
-            setShowBookingForm(false);
-            setSelectedProduct(null);
-        };
+    
 
-        console.log(selectedProduct);
-        
+    return (
+        <main className='relative mb-0' >
+            <Head title='Products'/>
+            <Navbar/>
+            <section className='section-container mt-4 flex flex-col gap-4 laptop:flex-row justify-between'>
+                {filterOpen && (
+                    <Sidebar
+                        filters={filters}
+                        categories={categories}
+                        cameraTypes={cameraTypes}
+                        brands={brands}
+                        handleFilterChange={handleFilterChange}
+                        setFilterOpen={setFilterOpen}
+                        className="absolute top-10 right-1/2 translate-x-1/2 bg-acccent z-40 w-[80%] laptop:w-[290px]    laptop:translate-x-0 laptop:static"
+                    />
+                )}
 
-        return (
-            <section>
-                <Head title='Products'/>
-                <Navbar/>
-                <h1>Semua Products</h1>
-                <div className="filters">
-                    <div>
-                        <h3>Kategori</h3>
-                        <label>
-                            <input
-                                type="radio"
-                                name="category"
-                                value=""
-                                checked={!filters.category}
-                                onChange={() => handleFilterChange('category', '')}
-                            />
-                            Semua
-                        </label>
-                        {categories.map(category => (
-                            <label key={category}>
-                                <input
-                                    type="radio"
-                                    name="category"
-                                    value={category}
-                                    checked={filters.category === category}
-                                    onChange={() => handleFilterChange('category', category)}
-                                />
-                                {category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')}
-                            </label>
-                        ))}
+                <div className='flex flex-col gap-3'>
+
+                    <div className='flex justify-between'>
+                        <h1 className='font-bold text-lg text-primary md:text-xl laptop:text-2xl'>
+                            Semua Products
+                        </h1>
+                        <button className='laptop:hidden' onClick={() => setFilterOpen(true)}>
+                            <img src={icons.filter.path} alt={icons.filter.name} className='md:w-6' />
+                        </button>
                     </div>
-
-
-                    <div className={`${filters.category === 'camera' ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
-                        <h3>Jenis Kamera</h3>
-                        <label>
-                            <input
-                                type="radio"
-                                name="camera_type"
-                                value=""
-                                checked={!filters.camera_type}
-                                onChange={() => handleFilterChange('camera_type', '')}
-                            />
-                            Semua
-                        </label>
-                        {cameraTypes.map(type => (
-                            <label key={type}>
-                                <input
-                                    type="radio"
-                                    name="camera_type"
-                                    value={type}
-                                    checked={filters.camera_type === type}
-                                    onChange={() => handleFilterChange('camera_type', type)}
-                                />
-                                {type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}
-                            </label>
-                        ))}
-                    </div>
-
-                    <div>
-                        <h3>Merek</h3>
-                        <label>
-                            <input
-                                type="radio"
-                                name="brand"
-                                value=""
-                                checked={!filters.brand}
-                                onChange={() => handleFilterChange('brand', '')}
-                            />
-                            Semua
-                        </label>
-                        {brands.map(brand => (
-                            <label key={brand}>
-                                <input
-                                    type="radio"
-                                    name="brand"
-                                    value={brand}
-                                    checked={filters.brand === brand}
-                                    onChange={() => handleFilterChange('brand', brand)}
-                                />
-                                {brand.charAt(0).toUpperCase() + brand.slice(1)}
-                            </label>
-                        ))}
-                    </div>
-
-                    <div>
+                    
+                    {/* <div>
                         <h3>Cari</h3>
                         <input
                             type="text"
@@ -121,24 +89,26 @@
                             value={filters.search || ''}
                             onChange={(e) => handleFilterChange('search', e.target.value)}
                         />
-                    </div>
-                </div>
+                    </div> */}
 
-                <div className="products">
-                    {products.map(product => (
-                        <div key={product.id} className="product-item">
-                            <a href={`/products/${product.id}`}>
-                                <h2>{product.name}</h2>
-                                {product.images.length > 0 && (
-                                    <img src={product.images[0].image_path} alt={product.name} />
-                                )}
-                                <p>Price: Rp {product.price_per_day}</p>
-                                <p>Stock: {product.stock}</p>
-                            </a>
-                            <button className='border p-2 bg-indigo-200 text-white' onClick={() => handleBooking(product, true)}>Add to Cart</button>
-                            <button className='border p-2 bg-indigo-200 text-white' onClick={() => handleBooking(product, false)}>Book Now</button>
-                        </div>
-                    ))}
+
+                    <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8'>
+                        {products.map(product => (
+                            <Link
+                                key={product.id}
+                                href={`/products/${product.id}`}
+                                className='w-fit h-fit'
+                            >
+                                <CardProduct
+                                    product={product}
+                                    productName={product.name}
+                                    productPrice={product.price_per_day}
+                                    bookNow={() => handleBooking(product, false)}
+                                    addToCart={() => handleBooking(product, true)}
+                                />
+                            </Link>
+                        ))}
+                    </div>
                 </div>
 
                 {showBookingForm && selectedProduct && (
@@ -149,5 +119,10 @@
                     />
                 )}
             </section>
-        );
-    }
+            { filterOpen && (
+                <div className='absolute bg-primary/50 backdrop-blur-sm left-0 z-20 top-0 right-0 bottom-0 laptop:hidden'/>
+            )}
+            <Footer/>
+        </main>
+    );
+}

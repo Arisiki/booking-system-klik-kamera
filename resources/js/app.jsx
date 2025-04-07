@@ -4,8 +4,6 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
-
-// Tambah useEffect untuk memuat script Midtrans
 import { useEffect } from 'react';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Klik Kamera';
@@ -23,7 +21,7 @@ createInertiaApp({
             useEffect(() => {
                 const script = document.createElement('script');
                 script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
-                script.setAttribute('data-client-key', props.initialPage.props.clientKey || ''); // Ambil clientKey dari props
+                script.setAttribute('data-client-key', props.initialPage.props.clientKey || ''); 
                 script.async = true;
                 document.body.appendChild(script);
 
