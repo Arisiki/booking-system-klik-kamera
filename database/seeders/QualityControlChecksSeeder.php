@@ -31,7 +31,7 @@ class QualityControlChecksSeeder extends Seeder
                     'product_id' => $item->product_id,
                     'type' => 'return',
                     'condition' => 'Minor wear',
-                    'is_damaged' => rand(0, 1),
+                    'is_damaged' => true,
                     'checked_at' => $order->end_date,
                 ]);
             }

@@ -27,6 +27,13 @@ class Product extends Model
     ];
 
     //relations
+    public function equipment()
+    {
+        return $this->belongsToMany(Equipment::class, 'equipment_product')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
+
     public function orderItems()
     {
         return $this->hasMany(OrderItems::class);

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import BookingForms from '../Bookings/BookingForms';
+import Navbar from '@/Layouts/Navbar';
 
 export default function DetailProduct() {
     const { product } = usePage().props;
@@ -16,9 +17,51 @@ export default function DetailProduct() {
         setShowBookingForm(false);
     };
 
+    console.log(product);
+
+
+    const [isImageActive, setImageActive] = useState(product.images)
+    // useEffect(() => {
+        
+    // }, [])
+
+    console.log(isImageActive);
+    
+
+
+
+
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
+        <article className="section-container">
+            <Navbar/>
+
+            <div>
+                <section className='w-full flex flex-col gap-4'>
+                    <img src={product.images[0].image_path} alt="" className='w-full h-[317px]' />
+                    <div className='flex flex-row justify-around'>
+                        {product.images.map((img) => (
+                            <img src={img.image_path}/>
+                        ))}
+                    </div>
+                </section>
+                <section>
+
+                </section>
+                <section>
+                    
+                </section>
+            </div>
+            
+
+
+
+
+
+
+
+
+
+            {/* <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
             <p>Category: {product.category.charAt(0).toUpperCase() + product.category.slice(1).replace('_', ' ')}</p>
             {product.camera_type && (
                 <p>Jenis Kamera: {product.camera_type.charAt(0).toUpperCase() + product.camera_type.slice(1).replace('_', ' ')}</p>
@@ -46,7 +89,7 @@ export default function DetailProduct() {
                 >
                     Book Now
                 </button>
-            </div>
+            </div> */}
 
             {showBookingForm && (
                 <BookingForms
@@ -57,7 +100,7 @@ export default function DetailProduct() {
             )}
 
             {/* Bagian Ulasan */}
-            <div className="mt-8">
+            {/* <div className="mt-8">
                 <h2 className="text-xl font-bold mb-4">Product Reviews</h2>
                 {product.reviews && product.reviews.length > 0 ? (
                     <div>
@@ -79,7 +122,7 @@ export default function DetailProduct() {
                 ) : (
                     <p>No reviews yet.</p>
                 )}
-            </div>
-        </div>
+            </div> */}
+        </article>
     );
 }

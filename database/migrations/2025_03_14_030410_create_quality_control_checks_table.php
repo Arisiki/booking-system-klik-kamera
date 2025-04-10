@@ -12,11 +12,14 @@ class CreateQualityControlChecksTable extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->string('category'); // Kolom category harus ada
-            $table->foreignId('checked_by')->constrained('users')->onDelete('cascade');
-            $table->dateTime('check_date');
-            $table->json('results');
-            $table->enum('status', ['Layak Digunakan', 'Perlu Perbaikan', 'Tidak Layak']);
+            $table->string('category')->nullable();
+            $table->foreignId('checked_by')->nullable()->constrained('users')->onDelete('cascade');
+            $table->dateTime('checked_at');
+            $table->json('results')->nullable();
+            $table->enum('type', ['receipt', 'return', 'admin_return']);
+            $table->enum('status', ['Layak Digunakan', 'Perlu Perbaikan', 'Tidak Layak'])->nullable();
+            $table->string('condition');
+            $table->boolean('is_damaged');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

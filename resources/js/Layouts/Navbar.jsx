@@ -67,7 +67,7 @@ const Navbar = () => {
             </div>
           )}
           {navData.map(({name, link}) => (
-            <Link key={name} href={link} className={`${url === link ? 'font-bold' : 'opacity-50'}`}>
+            <Link key={name} href={link} className={`${url.endsWith(link) ? 'font-bold' : 'opacity-50'}`}>
               {name}
             </Link>
           ))}

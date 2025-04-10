@@ -19,7 +19,14 @@ return new class extends Migration
             $table->date('end_date');
             $table->enum('pickup_method', ['pickup', 'home_delivery']);
             $table->decimal('total_cost', 10, 2);
-            $table->enum('status', ['pending', 'booked', 'awaiting return', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', [
+                'pending',
+                'payment_complete',
+                'booked',
+                'being_returned',
+                'completed',
+                'cancelled',
+            ])->default('pending');
             $table->timestamps();
         });
     }
@@ -28,7 +35,12 @@ return new class extends Migration
      * Reverse the migrations.
      */
     public function down(): void
+
     {
+        // Kembalikan kolom status ke string biasa
+        Schema::table('orders', function (Blueprint $table) {
+            $table->string('status')->default('pending')->change();
+        });
         Schema::dropIfExists('orders');
     }
 };

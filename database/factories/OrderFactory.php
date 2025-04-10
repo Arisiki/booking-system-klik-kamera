@@ -27,7 +27,8 @@ class OrderFactory extends Factory
             'end_date' => $endDate,
             'pickup_method' => fake()->randomElement(['home_delivery', 'pickup']),
             'total_cost' => fake()->numberBetween(100000, 600000),
-            'status' => fake()->randomElement(['pending', 'booked', 'awaiting return', 'completed', 'cancelled'])
+            'status' => fake()->randomElement(['pending', 'payment_complete',  'booked',  'being_returned', 'completed', 'cancelled'])
+
         ];
     }
 }
