@@ -8,7 +8,10 @@ const IconPlaceholder = ({iconImage, link, background, className, altImage}) => 
     href={link}
       className={`w-10 h-10 ${background ?? 'bg-acccent'} flex items-center justify-center rounded-md ${className}`}
     >
-      <img src={iconImage} alt={altImage} />
+      {typeof(iconImage) === 'string'
+        ?  <img src={iconImage} alt={altImage} />
+        : iconImage
+      }
     </Link>
   )
 }

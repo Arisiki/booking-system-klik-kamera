@@ -24,7 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/cart', [BookingController::class, 'showCart'])->name('cart.show');
     Route::post('/products/{product}/add-to-cart', [BookingController::class, 'addToCart'])->name('cart.add');
     Route::post('/products/{product}/book-now', [BookingController::class, 'bookNow'])->name('book.now');

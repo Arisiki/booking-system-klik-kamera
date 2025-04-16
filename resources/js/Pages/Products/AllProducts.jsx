@@ -110,6 +110,7 @@ export default function AllProducts() {
                         ))}
                     </div>
                 </div>
+                
 
                 {showBookingForm && selectedProduct && (
                     <BookingForms
