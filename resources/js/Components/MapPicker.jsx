@@ -30,7 +30,6 @@ export default function MapPicker({ onAddressSelect, initialAddress = '' }) {
     const inputRef = useRef(null);
 
 
-    // Handle place selection
     const handlePlaceSelect = () => {
         if (!autocompleteRef.current) return;
         
@@ -129,10 +128,9 @@ export default function MapPicker({ onAddressSelect, initialAddress = '' }) {
     if (!isLoaded) return <div>Loading Maps...</div>;
 
     return (
-        <div>
-            {/* Address input with autocomplete */}
-            <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', marginBottom: '5px' }}>
+        <div className='mt-8'>
+            <div className='flex flex-col gap-3 mb-4'>
+                <label className='className="text-md font-semibold'>
                     Masukan Alamat Lengkap
                 </label>
                 <input
@@ -143,59 +141,56 @@ export default function MapPicker({ onAddressSelect, initialAddress = '' }) {
                     placeholder="Cari alamat..."
                     required
                     maxLength={200}
-                    style={{ 
-                        width: '100%', 
-                        padding: '8px', 
-                        borderRadius: '4px',
-                        border: '1px solid #ccc'
-                    }}
+                    className="rounded-xl border border-thrid/20 w-full focus:border-primary focus:ring-0 "
                 />
-                <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
-                    Ketik alamat untuk mendapatkan rekomendasi atau pilih lokasi pada peta
+                <small className='text-thrid/70 text-xs'>
+                    Ketik alamat untuk mendapatkan rekomendasi atau pilih lokasi pada peta*
                 </small>
             </div>
-
-            <GoogleMap
-                mapContainerStyle={mapContainerStyle}
-                zoom={12}
-                center={selectedLocation || center}
-                onClick={handleMapClick}
-                options={{
-                    fullscreenControl: false,
-                    streetViewControl: true,
-                    mapTypeControl: false,
-                    zoomControl: true
-                }}
-            >
-                {selectedLocation && (
-                    <Marker
-                        position={selectedLocation}
-                        animation={window.google.maps.Animation.DROP}
-                    >
-                        {showInfoWindow && (
-                            <InfoWindow
-                                position={selectedLocation}
-                                onCloseClick={() => setShowInfoWindow(false)}
-                            >
-                                <div>
-                                    <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                                        {address}
-                                    </p>
-                                    <p style={{ fontSize: '12px', margin: 0 }}>
-                                        Lat: {selectedLocation.lat.toFixed(6)}, Lng: {selectedLocation.lng.toFixed(6)}
-                                    </p>
-                                </div>
-                            </InfoWindow>
-                        )}
-                    </Marker>
-                )}
-            </GoogleMap>
+            <div className='rounded-xl overflow-hidden'>
+                <GoogleMap
+                    mapContainerStyle={mapContainerStyle}
+                    zoom={12}
+                    center={selectedLocation || center}
+                    onClick={handleMapClick}
+                    options={{
+                        fullscreenControl: false,
+                        streetViewControl: true,
+                        mapTypeControl: false,
+                        zoomControl: true
+                    }}
+                >
+                    {selectedLocation && (
+                        <Marker
+                            position={selectedLocation}
+                            animation={window.google.maps.Animation.DROP}
+                        >
+                            {showInfoWindow && (
+                                <InfoWindow
+                                    position={selectedLocation}
+                                    onCloseClick={() => setShowInfoWindow(false)}
+                                >
+                                    <div>
+                                        <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                            {address}
+                                        </p>
+                                        <p style={{ fontSize: '12px', margin: 0 }}>
+                                            Lat: {selectedLocation.lat.toFixed(6)}, Lng: {selectedLocation.lng.toFixed(6)}
+                                        </p>
+                                    </div>
+                                </InfoWindow>
+                            )}
+                        </Marker>
+                        
+                    )}
+                </GoogleMap>
+            </div>
 
             {selectedLocation && (
-                <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '16px' }}>Alamat Terpilih:</h3>
-                    <p style={{ margin: '0 0 5px 0' }}>{address}</p>
-                    <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
+                <div className='border-secondary border p-3 mt-4 rounded-xl flex flex-col gap-2 md:max-w-[392px]'>
+                    <h3 className='text-secondary'>Alamat Terpilih:</h3>
+                    <p className='text-sm text-dark'>{address}</p>
+                    <p className='text-thrid/70 text-xs'>
                         Koordinat: Lat: {selectedLocation.lat.toFixed(6)}, Lng: {selectedLocation.lng.toFixed(6)}
                     </p>
                 </div>

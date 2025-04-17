@@ -25,6 +25,7 @@ export default function DetailProduct() {
         if(!user) return router.visit(route('login'));
         setIsAddToCart(addToCart);
         setShowBookingForm(true);
+        
     };
 
     const handleCloseForm = () => {
