@@ -52,7 +52,7 @@ const Navbar = () => {
     <nav className='border-b pb-3 section-container'>
       <div className='flex justify-between w-full gap-10 pt-4'>
         <button onClick={() => setIsNavOpen(true)} className='w-10 h-10 flex items-center justify-center rounded-md bg-acccent md:hidden'>
-          <img src="icons/Burger.svg" alt="hamburger-menu" className=''/>
+          <img src="/icons/Burger.svg" alt="hamburger-menu" className=''/>
         </button>
         <div className={`${isNavOpen ? 'flex flex-col absolute bg-primary text-white py-6 px-10 rounded-lg z-50 pt-14' : 'hidden'} items-center md:flex gap-[18px]  text-primary text-base`}>
           {isNavOpen && (

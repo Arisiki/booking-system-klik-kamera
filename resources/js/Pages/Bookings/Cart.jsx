@@ -20,6 +20,8 @@ export default function Cart() {
             onError: (errors) => console.log('Errors:', errors),
         });
     };
+    console.log(cartItems);
+    
 
     return (
         <>
@@ -33,6 +35,12 @@ export default function Cart() {
                             {cartItems.map((item, i) => (
                                 <CartCardProduct 
                                     key={i}
+                                    productName={item.product.name}
+                                    productQuantity={item.quantity}
+                                    startDate={item.start_date}
+                                    endDate={item.end_date}
+                                    dayPrice={item.product.price_per_day}
+                                    totalPrice={item.rental_cost}
                                 />
                             ))}
                         </div>

@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
+import Navbar from '@/Layouts/Navbar';
+import Footer from '@/Layouts/Footer';
 
 export default function Checkout() {
     const { order, snapToken } = usePage().props;
     const [isSnapReady, setIsSnapReady] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-    console.log(order);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const checkSnap = setInterval(() => {
             if (window.snap) {
                 setIsSnapReady(true);
+                setIsLoading(false);
                 clearInterval(checkSnap);
             }
         }, 100);
@@ -63,54 +65,44 @@ export default function Checkout() {
     }, [isSnapReady, snapToken, isPopupOpen]);
 
     return (
-        <div className="flex gap-2">
-            <div>
-                <h1 className="text-2xl font-bold">Checkout</h1>
-                <h3>Order Details</h3>
-                <p>User: {order.user_name}</p>
-                <p>Email: {order.email}</p>
-                <p>Phone: {order.phone_number}</p>
-                <p>
-                    Order Date:{' '}
-                    {new Date(order.order_date).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                    })}
-                </p>
-                <p>
-                    Start Date:{' '}
-                    {new Date(order.start_date).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                    })}
-                </p>
-                <p>
-                    End Date:{' '}
-                    {new Date(order.end_date).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                    })}
-                </p>
-                <p>Pickup Method: {order.pickup_method}</p>
-                <p>Total Cost: Rp {order.total_cost}</p>
-                <p>Status: {order.status}</p>
-            </div>
-            <div>
-                <h3>Order Items</h3>
-                {order.order_items.map((item, index) => (
-                    <div key={index}>
-                        <p>Product: {item.product.name}</p>
-                        <p>Quantity: {item.quantity}</p>
-                        <p>Rental Cost: Rp {item.rental_cost}</p>
-                        <p>Pick Up Address: {item.address || 'N/A'}</p>
-                    </div>
-                ))}
-            </div>
+        <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
+            <Navbar />
+            
+            <main className="flex-1 section-container py-6 md:py-10">
+                <div className="max-w-4xl mx-auto">
+                    <div className="flex flex-col gap-6">
+                        <div className="flex items-center justify-between">
+                            <h1 className="text-xl md:text-2xl font-bold text-primary">
+                                Pembayaran
+                            </h1>
+                            <p className="text-sm md:text-base text-third">
+                                Order ID: #{order?.id}
+                            </p>
+                        </div>
 
-            <div id="snap-container" className="w-1/2"></div>
+                        {isLoading ? (
+                            <div className="bg-white p-8 rounded-xl border border-third/10 text-center">
+                                <div className="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                                <p className="text-primary font-medium">Mempersiapkan halaman pembayaran...</p>
+                                <p className="text-third text-sm mt-2">Mohon tunggu sebentar</p>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-xl border border-third/10 overflow-hidden">
+                                <div className="border-b border-third/10 p-4">
+                                    <p className="text-primary font-medium">Detail Pembayaran</p>
+                                </div>
+                                <div 
+                                    id="snap-container" 
+                                    className="w-full md:w-[768px] h-[600px] md:h-[720px] mx-auto"
+                                >
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </main>
+
+            <Footer />
         </div>
     );
 }

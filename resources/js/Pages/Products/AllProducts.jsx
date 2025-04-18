@@ -94,19 +94,14 @@ export default function AllProducts() {
 
                     <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8'>
                         {products.map(product => (
-                            <Link
-                                key={product.id}
-                                href={`/products/${product.id}`}
-                                className='w-fit h-fit'
-                            >
                                 <CardProduct
                                     product={product}
                                     productName={product.name}
                                     productPrice={product.price_per_day}
                                     bookNow={() => handleBooking(product, false)}
                                     addToCart={() => handleBooking(product, true)}
+                                    productId={product.id}
                                 />
-                            </Link>
                         ))}
                     </div>
                 </div>

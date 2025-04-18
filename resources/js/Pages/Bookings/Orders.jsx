@@ -16,9 +16,9 @@ export default function Orders() {
     const { orders } = usePage().props;
     console.log(orders);
 
-    useEffect(() => {
-        router.reload({ only: ["orders"] });
-    }, []);
+    // useEffect(() => {
+    //     router.reload({ only: ["orders"] });
+    // }, []);
 
     const handleCancelOrder = (orderId) => {
         if (confirm("Are you sure you want to cancel this order?")) {
@@ -151,12 +151,20 @@ export default function Orders() {
                                     
                                     <div className="flex gap-2">
                                         {order.status === "pending" && (
-                                            <button
-                                                onClick={() => handleCancelOrder(order.id)}
-                                                className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition-colors"
-                                            >
-                                                Cancel
-                                            </button>
+                                            <div className="flex gap-4">
+                                                <button
+                                                onClick={() => router.visit(`/checkout/${order.id}`)}
+                                                    className="bg-primary text-white px-3 py-1 rounded-md text-sm hover:bg-dark transition-colors"
+                                                >
+                                                    Bayar
+                                                </button>
+                                                <button
+                                                    onClick={() => handleCancelOrder(order.id)}
+                                                    className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition-colors"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
                                         )}
                                         {order.status === "payment_complete" && (
                                             <button

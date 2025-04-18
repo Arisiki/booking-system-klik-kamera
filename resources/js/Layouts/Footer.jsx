@@ -64,7 +64,7 @@ const Footer = () => {
                   type="email"
                   className='text-primary border-none w-[80%] py-3'
                   placeholder='Tulis email kamu'
-                  onSubmit={'/'}
+                  // onSubmit={'/'}
                 />
                 <button className='bg-[#2D5D7C] py-3 px-4 w-[20%]'>
                   Join
