@@ -14,15 +14,16 @@ class QualityControlChecks extends Model
         'product_id',
         'category',
         'checked_by',
-        'check_date',
+        'checked_at',
         'results',
         'status',
         'notes',
+        'condition',
     ];
 
     protected $casts = [
         'results' => 'array',
-        'check_date' => 'datetime',
+        'checked_at' => 'datetime',
     ];
 
     public function order()

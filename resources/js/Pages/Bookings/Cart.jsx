@@ -1,6 +1,9 @@
 import React from 'react';
 import { usePage, useForm, router, Link } from '@inertiajs/react';
 import Navbar from '@/Layouts/Navbar';
+import CartCardProduct from '@/Components/CartCardProduct';
+import { formatRupiah } from '@/utils';
+import Footer from '@/Layouts/Footer';
 
 export default function Cart() {
     const { cartItems, totalCost, auth } = usePage().props;
@@ -19,41 +22,71 @@ export default function Cart() {
     };
 
     return (
-        <div>
+        <>
             <Navbar />
-            <Link href='/orders' className='px-3 py-2 border'>
-                My Order
-            </Link>
-            <h1>Shopping Cart</h1>
             {cartItems.length > 0 ? (
-                <div>
-                    {cartItems.map((item, index) => (
-                        <div key={index}>
-                            <h3>{item.product.name}</h3>
-                            <p>User: {item.user_name}</p>
-                            <p>Email: {item.email}</p>
-                            <p>Phone: {item.phone_number}</p>
-                            <p>Quantity: {item.quantity}</p>
-                            <p>Start Date: {item.start_date}</p>
-                            <p>End Date: {item.end_date}</p>
-                            <p>Rental Cost: Rp {item.rental_cost}</p>
-                            <p>Pickup Method: {item.pickup_method}</p>
-                            {item.pickup_address && <p>Address: {item.pickup_address}</p>}
+                <article className='section-container mt-2 flex flex-col gap-6 laptop:flex-row laptop:gap-24 laptop:mt-8'>
+                    {/* Product Section */}
+                    <section className='flex flex-col gap-3 laptop:w-3/4'>
+                        <h1 className='text-lg font-bold text-primary md:text-2xl'>Product</h1>
+                        <div className='flex flex-col gap-4'>
+                            {cartItems.map((item, i) => (
+                                <CartCardProduct 
+                                    key={i}
+                                />
+                            ))}
                         </div>
-                    ))}
-                    <h3>Total Cost: Rp {totalCost}</h3>
+                    </section>
+                    
+                    <div className='flex flex-col w-full laptop:w-2/4 gap-8'>
+                        {/* Personal detail section */}
+                        <section className='flex flex-col gap-3' >
+                            <h1 className='text-lg font-bold text-primary md:text-2xl'>Data Diri</h1>
+                            <div className='flex gap-6 border border-thrid/10 p-6 rounded-xl text-dark'>
+                                <div className='flex flex-col gap-2'>
+                                    <span>Nama</span>
+                                    <span>No Hp</span>
+                                    <span>Metode</span>
+                                    <span>Alamat</span>
+                                </div>
+                                <div className='flex flex-col gap-2'>
+                                    <p>{auth.user.name}</p>
+                                    <p>{cartItems[0].phone_number}</p>
+                                    <p>{cartItems[0].pickup_method}</p>
+                                    <p>{cartItems[0].pickup_address}</p>
+                                </div>
+                            </div>
+                        </section>
 
-                    <button
-                        onClick={handleCheckout}
-                        disabled={processing}
-                        className='px-4 py-2 border mb-20'
-                    >
-                        {processing ? 'Processing...' : 'Proceed to Checkout'}
-                    </button>
-                </div>
+                        {/* Total Price section */}
+                        <section className='flex flex-col gap-4'>
+                            <h1 className='text-lg font-bold text-primary md:text-2xl'>Total Price</h1>
+                            <hr className='my-2'/>
+                            <div className='flex flex-col gap-2'>
+                                {cartItems.map((item, i) => (
+                                    <div
+                                        key={i}
+                                        className='flex justify-between'
+                                    >
+                                        <span>{item.product.name}</span>
+                                        <p>{formatRupiah(item.rental_cost)}</p>
+                                    </div>
+                                ))}
+                                <div className='flex justify-between text-secondary font-bold mt-2'>
+                                    <span>Order total</span>
+                                    <p>{formatRupiah(totalCost)}</p>
+                                </div>
+                            </div>
+                            <button onClick={ handleCheckout} className='w-full bg-primary text-white py-3 rounded-xl'>Checkout</button>
+                        </section>
+                    </div>
+                </article>
             ) : (
-                <p>Your cart is empty.</p>
+                <p>Your cart is empty</p>
             )}
-        </div>
+            
+
+            <Footer />
+        </>
     );
 }

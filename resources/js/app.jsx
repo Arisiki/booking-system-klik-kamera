@@ -16,7 +16,6 @@ createInertiaApp({
             import.meta.glob('./Pages/**/*.jsx'),
         ),
     setup({ el, App, props }) {
-        // Komponen wrapper untuk memuat script Midtrans
         const AppWithMidtrans = () => {
             useEffect(() => {
                 const script = document.createElement('script');

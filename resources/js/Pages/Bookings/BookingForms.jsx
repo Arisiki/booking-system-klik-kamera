@@ -146,13 +146,23 @@ export default function BookingForms({
 
     const handleQuantityChange = (e) => {
         const value = e.target.value;
-        const newQuantity = value === 0 ? 1 : parseInt(value);
+        
+        if (value === '') {
+            setData('quantity', '');
+            return;
+        }
 
+        const newQuantity = parseInt(value);
+        
+        // Validate after user finishes typing
         if (!isNaN(newQuantity)) {
-            setData(
-                "quantity",
-                Math.max(1, Math.min(newQuantity, product.stock))
-            );
+            if (newQuantity > product.stock) {
+                setData('quantity', product.stock);
+            } else if (newQuantity < 1) {
+                setData('quantity', 1);
+            } else {
+                setData('quantity', newQuantity);
+            }
         }
     };
 

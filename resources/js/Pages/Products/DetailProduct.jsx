@@ -194,7 +194,7 @@ export default function DetailProduct() {
                         {product.reviews.map((review) => (
                             <div key={review.id} className="mb-4 p-4 border rounded">
                                 <p className="font-bold">{review.user.name}</p>
-                                <p className='text-yellow-400'>Rating: {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</p>
+                                <p className='text-yellow-400'>{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</p>
                                 <p>Comment: {review.comment || 'No comment'}</p>
                                 <p className="text-sm text-thrid/60">
                                     Reviewed on {new Date(review.created_at).toLocaleDateString('id-ID', {

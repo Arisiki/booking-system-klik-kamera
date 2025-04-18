@@ -1,4 +1,4 @@
-import { CiBatteryFull } from "react-icons/ci";
+
 
 export const formatRupiah = (value) => {
   if (isNaN(value)) return null;

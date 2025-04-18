@@ -20,6 +20,8 @@
         </script>
     </head>
     <body class="font-sans antialiased">
-        @inertia
+        <div class="mx-auto w-fit">
+            @inertia
+        </div>
     </body>
 </html>

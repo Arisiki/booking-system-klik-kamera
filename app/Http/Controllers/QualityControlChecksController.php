@@ -247,10 +247,11 @@ class QualityControlChecksController extends Controller
                 'product_id' => $result['product_id'],
                 'category' => $result['category'],
                 'checked_by' => auth()->id(),
-                'check_date' => now(),
+                'checked_at' => now(),
                 'results' => $result['checklist'],
                 'status' => $result['status'],
                 'notes' => $result['notes'],
+                'condition' => 'Koondisi Bagus',
             ]);
         }
 
