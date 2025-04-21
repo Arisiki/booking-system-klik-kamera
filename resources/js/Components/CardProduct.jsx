@@ -1,4 +1,5 @@
 import { icons } from '@/data'
+import { formatRupiah } from '@/utils'
 import { Link } from '@inertiajs/react'
 import React from 'react'
 
@@ -19,13 +20,13 @@ const CardProduct = ({productName, productPrice, productId, productImage, bookNo
         <h2 className='text-white text-xs hidden laptop:block'>Pilihan Terbaik</h2>
       </div>
 
-      <img src="icons/Kamera.png" alt="" className='lg:w-[149px] lg:h-[133px]'/>
+      <img src={`/storage/${productImage.find(img => img.is_primary).image_path}`} alt="" className='lg:w-[149px] lg:h-[133px]'/>
       </Link>
 
       <div className='flex flex-col mt-2 gap-4 min-w-full'>
         <div className='flex flex-col gap-2'>
           <h2 className='font-bold text-primary text-lg leading-none lg:text-xl'>{productName}</h2>
-          <h3 className='font-bold text-secondary text-sm leading-none lg:text-base'>Rp.{formattedPrice.split('.')[0]}K /Day</h3>
+          <h3 className='font-bold text-secondary text-sm leading-none lg:text-base'>{formatRupiah(productPrice)} /Hari</h3>
           <hr />
         </div>
 

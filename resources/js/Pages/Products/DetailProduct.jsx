@@ -47,6 +47,7 @@ export default function DetailProduct() {
     }
 
     useScrollTop([showBookingForm]);
+    console.log(activeImage);
     
 
     return (
@@ -56,22 +57,22 @@ export default function DetailProduct() {
 
                 <div className='flex flex-col gap-6 laptop:flex-row laptop:justify-between' >
                     <section className='w-full flex flex-col gap-2 md:flex-row md:gap-4 laptop:w-1/2 laptop:justify-bertween items-center laptop:items-start'>
-                        <img src={'/icons/Kamera.svg'} alt="" className='w-full md:order-2 max-w-[361px] md:max-w-[531px] laptop:w-4/5' />
+                        <img src={`/storage/${activeImage}`} alt="" className='h-80 md:h-[404px] rounded-xl md:order-2 w-[361px] object-cover md:w-[531px] laptop:w-4/5' />
                         <div className='flex flex-row md:flex-col gap-4 justify-around w-full md:justify-start md:w-fit'>
                             {productImages.map((img) => (
                                 <button
                                     key={img.id}
                                     onClick={() => handleImageClick(img)}
                                     disabled={img.image_path === activeImage}
-                                    className={`${(img.is_active || !hasActiveImage && img.is_primary ) && 'border-2 border-primary/30'} p-2 rounded-lg max-w-[95px] md:max-w-[149px] laptop:w-[110px]`}
+                                    className={`${(img.is_active || !hasActiveImage && img.is_primary ) && 'border-2 border-primary/30'} p-2 rounded-2xl max-w-[95px] md:max-w-[149px] laptop:w-[110px]`}
                                 >
-                                    <img src={'/icons/Kamera.svg'} className='w-full h-full'/>
+                                    <img src={`/storage/${img.image_path}`} className='w-full h-full rounded-xl'/>
                                 </button>
                             ))}
                         </div>
                     </section>
                     
-                    <section className='flex flex-col gap-4  laptop:w-1/2'>
+                    <section className='flex flex-col gap-4  laptop:w-2/5 lg:w-1/2'>
                         <div className='flex flex-col md:gap-4'>
                             <h1 className='text-primary font-bold text-[40px] md:text-5xl'>
                                 {product.name}

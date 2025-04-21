@@ -101,6 +101,7 @@ export default function AllProducts() {
                                     bookNow={() => handleBooking(product, false)}
                                     addToCart={() => handleBooking(product, true)}
                                     productId={product.id}
+                                    productImage={product.images}
                                 />
                         ))}
                     </div>

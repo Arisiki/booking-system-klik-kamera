@@ -84,7 +84,7 @@ export default function OrderShow({ order, statuses }) {
                     <div className="space-y-2">
                         <p><span className="font-medium">Name:</span> {order.user_name}</p>
                         <p><span className="font-medium">Email:</span> {order.email}</p>
-                        <p><span className="font-medium">Phone:</span> {order.phone || 'N/A'}</p>
+                        <p><span className="font-medium">Phone:</span> {order.phone_number || 'N/A'}</p>
                     </div>
                 </div>
                 
@@ -94,7 +94,7 @@ export default function OrderShow({ order, statuses }) {
                         <p><span className="font-medium">Order Date:</span> {new Date(order.created_at).toLocaleDateString()}</p>
                         <p><span className="font-medium">Rental Period:</span> {new Date(order.start_date).toLocaleDateString()} - {new Date(order.end_date).toLocaleDateString()}</p>
                         <p><span className="font-medium">Duration:</span> {order.duration} days</p>
-                        <p><span className="font-medium">Total:</span> {formatRupiah(order.total_price)}</p>
+                        <p><span className="font-medium">Total:</span> {formatRupiah(order.total_cost)}</p>
                     </div>
                 </div>
                 
@@ -208,7 +208,7 @@ export default function OrderShow({ order, statuses }) {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-900">
-                                            {formatRupiah(item.price_per_day * item.quantity * order.duration)}
+                                            {formatRupiah(item.rental_cost)}
                                         </div>
                                     </td>
                                 </tr>
@@ -220,7 +220,7 @@ export default function OrderShow({ order, statuses }) {
                                     Total:
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap font-bold">
-                                    {formatRupiah(order.total_price)}
+                                    {formatRupiah(order.total_cost)}
                                 </td>
                             </tr>
                         </tfoot>
