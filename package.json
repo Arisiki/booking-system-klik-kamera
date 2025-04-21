@@ -24,6 +24,8 @@
     "dependencies": {
         "@react-google-maps/api": "^2.20.6",
         "date-fns": "^4.1.0",
+        "moment": "^2.30.1",
+        "react-big-calendar": "^1.18.0",
         "react-countdown": "^2.3.6",
         "react-date-range": "^2.0.1",
         "react-icon": "^1.0.0",
