@@ -21,6 +21,7 @@ class Order extends Model
         'pickup_method',
         'total_cost',
         'status',
+        'admin_notes',
     ];
 
     protected $casts = [

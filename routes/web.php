@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
@@ -38,4 +42,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orders/{order}/qc', [QualityControlChecksController::class, 'showForm'])->name('qc.show');
     Route::post('/orders/{order}/qc', [QualityControlChecksController::class, 'store'])->name('qc.store');
 });
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // User Management
+    Route::resource('users', UserController::class);
+    
+    // Product Management
+    Route::resource('products', ProductController::class);
+    
+    // Order Management
+    // Custom order routes must come BEFORE the resource route
+    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+    
+    // This must come AFTER the custom routes
+    Route::resource('orders', OrderController::class)->only(['index', 'show']);
+});
+
 require __DIR__ . '/auth.php';

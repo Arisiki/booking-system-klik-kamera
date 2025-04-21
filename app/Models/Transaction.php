@@ -16,7 +16,10 @@ class Transaction extends Model
         'type',
         'condition',
         'is_damaged',
-        'checked_at'
+        'checked_at',
+        'amount',
+        'payment_method',
+        'transaction_date'
     ];
 
     protected $casts = [
