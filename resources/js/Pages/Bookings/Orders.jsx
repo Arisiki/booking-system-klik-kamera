@@ -5,7 +5,7 @@ import BookingForms from "./BookingForms";
 import ReviewForm from "@/Components/ReviewForm";
 import Countdown from "react-countdown";
 import Footer from "@/Layouts/Footer";
-import { formatRupiah } from "@/utils";
+import { formatRupiah, useScrollTop } from "@/utils";
 
 export default function Orders() {
     const [showBookingForm, setShowBookingForm] = useState(false);
@@ -66,6 +66,8 @@ export default function Orders() {
         );
     };
 
+    useScrollTop([showBookingForm]);
+
     return (
         <main className="relative mb-0">
             <Navbar />
@@ -111,7 +113,7 @@ export default function Orders() {
                                         {order.order_items.map((item) => (
                                             <div key={item.id} className="mb-1">
                                                 <span className="font-medium">{item.product.name}</span> 
-                                                <span className="text-thrid/70 text-sm">(Qty: {item.quantity})</span>
+                                                <span className="text-thrid/70 text-sm"> (Jumlah item: {item.quantity})</span>
                                             </div>
                                         ))}
                                     </div>
@@ -242,6 +244,9 @@ export default function Orders() {
                     />
                 )}
             </section>
+            { showBookingForm && (
+                <div className='fixed bg-primary/50 backdrop-blur-sm left-0 z-40 top-0 right-0 bottom-0'/>
+            )}
             <Footer />
         </main>
     );

@@ -376,14 +376,19 @@ class BookingController extends Controller
             ->orderBy('order_date', 'desc')
             ->get()
             ->map(function ($order) {
-                // Cek apakah masa booking telah selesai
-                if ($order->status == 'booked' && Carbon::parse($order->end_date)->isPast()) {
-                    $order->update(['status' => 'Being returned']);
-                    $order->status = 'Being returned';
+                if (in_array($order->status, ['pending', 'pending_payment'])) {
+                    $expiryTime = Carbon::parse($order->order_date)->addHours(3);
+                    if (now()->isAfter($expiryTime)) {
+                        $order->update(['status' => 'cancelled']);
+                        $order->status = 'cancelled'; 
+                    } else {
+                        $order->expires_at = $expiryTime;
+                    }
                 }
 
-                if (in_array($order->status, ['pending', 'pending_payment'])) {
-                    $order->expires_at = Carbon::parse($order->order_date)->addHour(3);
+                if ($order->status == 'booked' && Carbon::parse($order->end_date)->isPast()) {
+                    $order->update(['status' => 'being_returned']);
+                    $order->status = 'being_returned';
                 }
 
                 return $order;

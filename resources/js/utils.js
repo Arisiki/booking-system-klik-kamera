@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 
 
 export const formatRupiah = (value) => {
@@ -40,3 +41,9 @@ export const formatDate = (dateString) => {
   
   return `${day} ${month} ${year}`;
 };
+
+export const useScrollTop = (dependecies = []) => {
+  useEffect(() => {
+    window.scrollTo(0,0);
+  }, dependecies)
+}

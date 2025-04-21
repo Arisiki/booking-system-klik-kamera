@@ -6,6 +6,7 @@ import Sidebar from '@/Components/Sidebar';
 import Footer from '@/Layouts/Footer';
 import { icons } from '@/data';
 import CardProduct from '@/Components/CardProduct';
+import { useScrollTop } from '@/utils';
 
 
 export default function AllProducts() {
@@ -48,8 +49,7 @@ export default function AllProducts() {
         };
     }, [])
 
-    console.log(filterOpen);
-    
+    useScrollTop([showBookingForm]);
 
     
 
@@ -115,8 +115,11 @@ export default function AllProducts() {
                     />
                 )}
             </section>
-            { filterOpen && (
+            { filterOpen &&  (
                 <div className='absolute bg-primary/50 backdrop-blur-sm left-0 z-20 top-0 right-0 bottom-0 laptop:hidden'/>
+            )}
+            { showBookingForm && (
+                <div className='absolute bg-primary/50 backdrop-blur-sm left-0 z-40 top-0 right-0 bottom-0'/>
             )}
             <Footer/>
         </main>

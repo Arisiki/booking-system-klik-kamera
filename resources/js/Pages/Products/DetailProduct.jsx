@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import BookingForms from '../Bookings/BookingForms';
 import Navbar from '@/Layouts/Navbar';
-import { formatRupiah } from '@/utils';
+import { formatRupiah, useScrollTop } from '@/utils';
 import { set } from 'date-fns';
 import { IoIosBatteryFull, IoIosCamera } from 'react-icons/io';
 import { BsFillBagCheckFill } from "react-icons/bs";
@@ -46,7 +46,7 @@ export default function DetailProduct() {
         setProductImages(updatedImages);
     }
 
-    console.log('product detail', product);
+    useScrollTop([showBookingForm]);
     
 
     return (
@@ -283,7 +283,11 @@ export default function DetailProduct() {
                     )}
                 </div> */}
             </article>
+            
             <Footer />
+            { showBookingForm && (
+                <div className='fixed bg-primary/50 backdrop-blur-sm left-0 z-40 top-0 right-0 bottom-0'/>
+            )}
         </>
     );
 }

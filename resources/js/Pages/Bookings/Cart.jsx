@@ -90,7 +90,7 @@ export default function Cart() {
                     </div>
                 </article>
             ) : (
-                <p>Your cart is empty</p>
+                <p className='h-screen'>Your cart is empty</p>
             )}
             
 
