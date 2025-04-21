@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
@@ -50,6 +50,14 @@ export default function Edit({ mustVerifyEmail, status }) {
                             </p>
                             <DeleteUserForm className="max-w-xl" />
                         </div>
+                        <Link
+                            href={route('logout')}
+                            method="post"
+                            as="button"
+                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            Log Out
+                        </Link>
                     </div>
             </section>
             

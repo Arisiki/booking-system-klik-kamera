@@ -68,6 +68,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/availability', [App\Http\Controllers\Admin\AvailabilityController::class, 'index'])->name('availability.index');
     Route::get('/availability/data', [App\Http\Controllers\Admin\AvailabilityController::class, 'getAvailability'])->name('availability.data');
     Route::post('/availability/block', [App\Http\Controllers\Admin\AvailabilityController::class, 'blockDates'])->name('availability.block');
+    // Add this to your admin routes group
+    Route::post('/products/{product}/set-primary-image/{image}', [ProductController::class, 'setPrimaryImage'])
+        ->name('admin.products.set-primary-image');
 });
 
 require __DIR__ . '/auth.php';

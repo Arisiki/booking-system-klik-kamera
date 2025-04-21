@@ -18,6 +18,9 @@ export default function ProductsIndex({ products, filters }) {
         }
     };
 
+    console.log(products);
+    
+
     return (
         <AdminLayout>
             <Head title="Products Management" />
@@ -81,7 +84,7 @@ export default function ProductsIndex({ products, filters }) {
                                     <tr key={product.id}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <img
-                                                src={product.image_path ? `/storage/${product.image_path}` : '/icons/Kamera.png'}
+                                                src={`/storage/${product.images.find(img => img.is_primary).image_path}`}
                                                 alt={product.name}
                                                 className="h-12 w-12 object-cover rounded"
                                             />

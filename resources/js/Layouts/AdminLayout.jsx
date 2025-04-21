@@ -34,17 +34,11 @@ export default function AdminLayout({ children }) {
                             <FiClipboard className="w-5 h-5 mr-3" />
                             Orders
                         </NavLink>
-                        <Link
-                            href={route('admin.availability.index')}
-                            className={`flex items-center px-4 py-2 mt-2 text-gray-600 rounded-md hover:bg-gray-100 ${
-                                route().current('admin.availability.*') ? 'bg-gray-100 text-primary' : ''
-                            }`}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>Availability</span>
-                        </Link>
+                        <NavLink href={route('admin.availability.index')}>
+                            <FiClipboard className="w-5 h-5 mr-3" />
+                            Availability
+                        </NavLink>
+                        
                     </nav>
                 </div>
                 <div className="absolute bottom-0 w-full p-4 border-t">

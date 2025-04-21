@@ -1,6 +1,9 @@
 <?php
 
+namespace Tests\Feature\Auth;
+
 use App\Models\User;
+use Tests\TestCase;
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
@@ -9,7 +12,9 @@ test('login screen can be rendered', function () {
 });
 
 test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create([
+        'role' => 'user' // Explicitly create a customer user
+    ]);
 
     $response = $this->post('/login', [
         'email' => $user->email,
@@ -18,6 +23,20 @@ test('users can authenticate using the login screen', function () {
 
     $this->assertAuthenticated();
     $response->assertRedirect(route('home', absolute: false));
+});
+
+test('admin can authenticate and redirect to admin dashboard', function () {
+    $admin = User::factory()->create([
+        'role' => 'admin'
+    ]);
+
+    $response = $this->post('/login', [
+        'email' => $admin->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('admin.dashboard', absolute: false));
 });
 
 test('users can not authenticate with invalid password', function () {

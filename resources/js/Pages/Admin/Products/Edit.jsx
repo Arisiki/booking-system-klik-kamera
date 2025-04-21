@@ -5,8 +5,10 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
+import axios from 'axios';
 
 export default function EditProduct({ product }) {
+    // Update form data to handle multiple images
     const { data, setData, post, processing, errors } = useForm({
         name: product.name || '',
         description: product.description || '',
@@ -15,17 +17,14 @@ export default function EditProduct({ product }) {
         category: product.category || '',
         brand: product.brand || '',
         camera_type: product.camera_type || '',
-        image: null,
+        images: [], // For new images
+        remove_images: [], // For images to remove
         _method: 'PUT',
     });
 
-    const [preview, setPreview] = useState(null);
-
-    useEffect(() => {
-        if (product.image_path) {
-            setPreview(`/storage/${product.image_path}`);
-        }
-    }, [product]);
+    // State for existing images and previews
+    const [existingImages, setExistingImages] = useState(product.images || []);
+    const [previews, setPreviews] = useState([]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -33,16 +32,53 @@ export default function EditProduct({ product }) {
     };
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        setData('image', file);
+        const files = Array.from(e.target.files);
         
-        if (file) {
+        // Check if adding these images would exceed the limit
+        if (existingImages.length - data.remove_images.length + files.length > 3) {
+            alert('Maximum 3 images allowed');
+            return;
+        }
+        
+        setData('images', [...data.images, ...files]);
+        
+        // Generate previews for new images
+        const newPreviews = [];
+        files.forEach(file => {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setPreview(reader.result);
+                newPreviews.push(reader.result);
+                if (newPreviews.length === files.length) {
+                    setPreviews([...previews, ...newPreviews]);
+                }
             };
             reader.readAsDataURL(file);
-        }
+        });
+    };
+
+    const removeExistingImage = (imageId) => {
+        setData('remove_images', [...data.remove_images, imageId]);
+    };
+
+    const removeNewImage = (index) => {
+        const newImages = [...data.images];
+        newImages.splice(index, 1);
+        setData('images', newImages);
+        
+        const newPreviews = [...previews];
+        newPreviews.splice(index, 1);
+        setPreviews(newPreviews);
+    };
+
+    const setAsPrimary = (imageId) => {
+        const updatedImages = existingImages.map(img => ({
+            ...img,
+            is_primary: img.id === imageId
+        }));
+        setExistingImages(updatedImages);
+        
+        // Update on server
+        axios.post(route('admin.products.set-primary-image', [product.id, imageId]));
     };
 
     return (
@@ -156,20 +192,40 @@ export default function EditProduct({ product }) {
                                 </div>
                                 
                                 <div>
-                                    <InputLabel htmlFor="image" value="Product Image" />
+                                    <InputLabel htmlFor="images" value="Add New Images" />
                                     <input
-                                        id="image"
+                                        id="images"
                                         type="file"
                                         className="mt-1 block w-full"
                                         onChange={handleImageChange}
                                         accept="image/*"
+                                        multiple
+                                        disabled={(existingImages.length - data.remove_images.length + data.images.length) >= 3}
                                     />
-                                    <InputError message={errors.image} className="mt-2" />
+                                    <InputError message={errors.images} className="mt-2" />
                                     
-                                    {preview && (
-                                        <div className="mt-3">
-                                            <p className="text-sm text-gray-500 mb-2">Current Image:</p>
-                                            <img src={preview} alt="Preview" className="max-w-xs rounded-md" />
+                                    {/* Remove the old preview check and use the new previews array */}
+                                    {previews.length > 0 && (
+                                        <div className="mt-4 flex flex-wrap gap-4">
+                                            {previews.map((preview, index) => (
+                                                <div key={index} className="relative">
+                                                    <img 
+                                                        src={preview} 
+                                                        alt={`New Preview ${index + 1}`} 
+                                                        className="w-32 h-32 object-cover rounded-md"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeNewImage(index)}
+                                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                    <span className="absolute bottom-0 left-0 bg-gray-700 text-white text-xs px-2 py-1 rounded-tr-md">
+                                                        New
+                                                    </span>
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
                                 </div>
