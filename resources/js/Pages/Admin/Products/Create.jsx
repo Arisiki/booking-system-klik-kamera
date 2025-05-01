@@ -22,11 +22,42 @@ export default function CreateProduct({ categories, brands }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('admin.products.store'), {
+
+        // Validate files before upload
+        if (data.images.length > 0) {
+            for (const file of data.images) {
+                if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                    alert(`File ${file.name} is too large. Maximum size is 2MB`);
+                    return;
+                }
+            }
+        }
+
+        // Create FormData
+        const formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (key === 'images') {
+                data.images.forEach(file => {
+                    formData.append('images[]', file);
+                });
+            } else {
+                formData.append(key, data[key]);
+            }
+        });
+
+        post(route('admin.products.store'), formData, {
             onSuccess: () => {
                 reset();
                 setPreviews([]);
             },
+            onError: (errors) => {
+                console.error('Upload errors:', errors);
+                if (errors.error) {
+                    alert(errors.error);
+                } else {
+                    alert('Failed to create product. Please try again.');
+                }
+            }
         });
     };
 

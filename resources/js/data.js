@@ -33,7 +33,7 @@ export const icons =
     },
     arrowUp: {
       name: 'arrow-up-icon',
-      path: 'icons/ArrowUp.svg'
+      path: '/icons/ArrowUp.svg'
     },
     addCart: {
       name: 'add-cart-icon',

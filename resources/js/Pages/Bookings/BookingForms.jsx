@@ -45,7 +45,8 @@ export default function BookingForms({
         phoneNumber: phoneNumber || "",
     });
 
-
+    console.log(product);
+    
     // Function to receive address from MapPicker
     const handleAddressSelect = (fullAddress) => {
         setData("pickupAddress", fullAddress);
@@ -250,7 +251,7 @@ export default function BookingForms({
                                     minDate={new Date()}
                                     dateDisplayFormat="yyyy-MM-dd"
                                     className="w-fit overflow-hidden border rounded-xl"
-                                    direction="vertikal"
+                                    direction="vertical"
                                     rangeColors={['#2D5D7C']}
                                     color="#2D5D7C"
                                     

@@ -15,11 +15,14 @@ export default function AllProducts() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isAddToCart, setIsAddToCart] = useState(false);
 
+    const user = usePage().props.auth.user;
+
     const handleFilterChange = (key, value) => {
         router.get('/products', { ...filters, [key]: value }, { preserveState: true });
     };
 
     const handleBooking = (product, addToCart = false) => {
+        if (!user) return router.visit('login');
         setSelectedProduct(product);
         setIsAddToCart(addToCart);
         setShowBookingForm(true);
@@ -95,6 +98,7 @@ export default function AllProducts() {
                     <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8'>
                         {products.map(product => (
                                 <CardProduct
+                                    key={product.id}
                                     product={product}
                                     productName={product.name}
                                     productPrice={product.price_per_day}

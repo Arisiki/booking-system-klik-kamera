@@ -8,6 +8,7 @@ use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -47,44 +48,74 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price_per_day' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'category' => 'required|string',
-            'brand' => 'required|string',
-            'camera_type' => 'nullable|string',
-            'images' => 'required|array|min:1|max:3',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            // Add debug logging
+            \Log::info('Incoming product creation request', [
+                'has_files' => $request->hasFile('images'),
+                'files_count' => $request->hasFile('images') ? count($request->file('images')) : 0
+            ]);
 
-        // Create the product
-        $product = Product::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'price_per_day' => $validated['price_per_day'],
-            'stock' => $validated['stock'],
-            'category' => $validated['category'],
-            'brand' => $validated['brand'],
-            'camera_type' => $validated['camera_type'] ?? null,
-        ]);
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'price_per_day' => 'required|numeric|min:0',
+                'stock' => 'required|integer|min:0',
+                'category' => 'required|string',
+                'brand' => 'required|string',
+                'camera_type' => 'nullable|string',
+                'images' => 'required|array|min:1|max:3',
+                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            ]);
 
-        // Handle multiple images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $imageFile) {
-                $path = $imageFile->store('products', 'public');
-                
-                $product->images()->create([
-                    'image_path' => $path,
-                    'is_primary' => $index === 0, // First image is primary
-                    'is_active' => $index === 0, // First image is active by default
-                ]);
+            // Create the product
+            $product = Product::create([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'price_per_day' => $validated['price_per_day'],
+                'stock' => $validated['stock'],
+                'category' => $validated['category'],
+                'brand' => $validated['brand'],
+                'camera_type' => $validated['camera_type'] ?? null,
+            ]);
+
+            // Handle multiple images with error checking
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $imageFile) {
+                    try {
+                        if (!$imageFile->isValid()) {
+                            throw new \Exception('Invalid file upload: ' . $imageFile->getErrorMessage());
+                        }
+
+                        // Log file information
+                        \Log::info('Processing image file', [
+                            'original_name' => $imageFile->getClientOriginalName(),
+                            'size' => $imageFile->getSize(),
+                            'mime' => $imageFile->getMimeType()
+                        ]);
+
+                        $path = $imageFile->store('products', 'public');
+                        
+                        $product->images()->create([
+                            'image_path' => $path,
+                            'is_primary' => $index === 0,
+                            'is_active' => true,
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to process image: ' . $e->getMessage());
+                        throw $e;
+                    }
+                }
             }
-        }
 
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product created successfully.');
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Product created successfully.');
+
+        } catch (\Exception $e) {
+            \Log::error('Product creation failed: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to create product: ' . $e->getMessage()]);
+        }
     }
 
     public function show(Product $product)
@@ -126,7 +157,7 @@ class ProductController extends Controller
             'brand' => 'required|string',
             'camera_type' => 'nullable|string',
             'images' => 'nullable|array|max:3',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'integer|exists:images,id',
         ]);
@@ -141,7 +172,6 @@ class ProductController extends Controller
             'camera_type' => $validated['camera_type'] ?? null,
         ]);
 
-        // Remove images if requested
         if ($request->has('remove_images')) {
             foreach ($request->remove_images as $imageId) {
                 $image = Image::find($imageId);
@@ -163,7 +193,7 @@ class ProductController extends Controller
                     
                     $product->images()->create([
                         'image_path' => $path,
-                        'is_primary' => $product->images()->count() === 0, // Primary if it's the only image
+                        'is_primary' => $product->images()->count() === 0, 
                         'is_active' => false,
                     ]);
                 }
