@@ -28,7 +28,7 @@ export default function Accecories() {
         <main>
         <Navbar />
           <article className='section-container mt-4'>
-          <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-5 gap-8'>
+          <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 laptop:grid-cols-5 gap-8'>
               {products.map(product => (
                       <CardProduct
                           key={product.id}
