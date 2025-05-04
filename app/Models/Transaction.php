@@ -23,7 +23,7 @@ class Transaction extends Model
     ];
 
     protected $casts = [
-        'type' => 'string', // ENUM('receipt', 'return', 'admin_return')
+        'type' => 'string',
         'condition' => 'string',
         'is_damaged' => 'boolean',
         'checked_at' => 'datetime',

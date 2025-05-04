@@ -11,7 +11,7 @@ const CardProduct = ({productName, productPrice, productId, productImage, bookNo
   }).format(productPrice)
   return (
     <div
-      className='md:w-[20dvw] border rounded-[18px] px-2 pt-10 pb-5 flex flex-col items-center gap-2 laptop:w-[16dvw] lg:w-[250px] h-fit laptop:px-3 lg:px-5 relative'
+      className='md:w-[20dvw] bg-white border rounded-[18px] px-2 pt-10 pb-5 flex flex-col items-center gap-2 laptop:w-[16dvw] lg:w-[250px] h-fit laptop:px-3 lg:px-5 relative'
     >
       <Link href={`/products/${productId}`}>
       <div className='absolute flex top-0 left-4 w-fit h-fit p-[10px] bg-secondary rounded-b-lg gap-1'>

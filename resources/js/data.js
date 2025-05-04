@@ -93,3 +93,26 @@ export const icons =
     },
 
   ];
+
+  export const brandLogos = [
+    {
+      name: 'sony',
+      path: '/sony.svg'
+    },
+    {
+      name: 'cannon',
+      path: '/cannon.svg'
+    },
+    {
+      name: 'fujifilm',
+      path: '/fujifilm.svg'
+    },
+    {
+      name: 'nikon',
+      path: '/nikon.png'
+    },
+    {
+      name: 'dji',
+      path: '/dji.svg'
+    },
+  ]

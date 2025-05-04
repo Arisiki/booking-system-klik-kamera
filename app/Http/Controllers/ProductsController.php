@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Log;
 
 class ProductsController extends Controller
 {
@@ -84,6 +85,19 @@ class ProductsController extends Controller
         return Inertia::render('Products/Accecories', [
             'products' => $products,
             'brand' => $brand
+        ]);
+    }
+
+    public function showRecomendations(Request $request) {
+        $products = Product::query()
+            ->where('category', 'camera')
+            ->where('camera_type', 'mirrorless')
+            ->with('images')
+            ->get();
+
+
+        return Inertia::render('Home', [
+            'products' => $products
         ]);
     }
 }

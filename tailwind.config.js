@@ -13,7 +13,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                caveat: ['Caveat', 'cursive'],
             },
             colors: {
                 primary: '#2D5D7C',
