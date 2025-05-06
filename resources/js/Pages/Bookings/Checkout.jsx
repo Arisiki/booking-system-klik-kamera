@@ -65,8 +65,9 @@ export default function Checkout() {
     }, [isSnapReady, snapToken, isPopupOpen]);
 
     return (
+        <>
+        <Navbar />
         <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
-            <Navbar />
             
             <main className="flex-1 section-container py-6 md:py-10">
                 <div className="max-w-4xl mx-auto">
@@ -102,7 +103,8 @@ export default function Checkout() {
                 </div>
             </main>
 
-            <Footer />
         </div>
+        <Footer />
+        </>
     );
 }

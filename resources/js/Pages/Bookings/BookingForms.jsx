@@ -45,7 +45,6 @@ export default function BookingForms({
         phoneNumber: phoneNumber || "",
     });
 
-    console.log(product);
     
     // Function to receive address from MapPicker
     const handleAddressSelect = (fullAddress) => {
@@ -168,7 +167,7 @@ export default function BookingForms({
     };
 
     return (
-        <div className="border  border-dark rounded-xl overflow-hidden pb-4 md:pb-8 bg-white absolute top-4 left-0 right-0 laptop:w-fit  mx-auto z-50">
+        <div className="border border-dark rounded-xl overflow-hidden pb-4 md:pb-8 bg-white absolute top-0 md:top-10 left-0 right-0 laptop:w-fit  mx-auto z-[100]">
             <div div className="w-full w h-14 bg-dark flex items-center justify-between mb-5 px-4">
                 <h3 className="text-xl text-white font-bold text-center">Booking Form - <span className="text-[#FFD152]">{product.name}</span></h3>
                 <button onClick={onClose}>

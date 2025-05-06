@@ -57,9 +57,9 @@ export default function AllProducts() {
     
 
     return (
-        <>
-            <Navbar/>
-            <main className='relative mb-0' >
+            <main>
+                <Navbar/>
+                <div className='relative mb-0' >
                 <Head title='Products'/>
                 <section className='section-container mt-4 flex flex-col gap-4 laptop:flex-row justify-between'>
                     {filterOpen && (
@@ -111,24 +111,23 @@ export default function AllProducts() {
                             ))}
                         </div>
                     </div>
-                    
-
-                    {showBookingForm && selectedProduct && (
-                        <BookingForms
+                </section>
+                
+                </div>
+                { filterOpen &&  (
+                    <div className='absolute bg-primary/50 backdrop-blur-sm left-0 z-[35] top-0 right-0 bottom-0 laptop:hidden'/>
+                )}
+                { showBookingForm && selectedProduct && (
+                    <div>
+                         <BookingForms
                             product={selectedProduct}
                             onClose={handleCloseForm}
                             isAddToCart={isAddToCart}
                         />
-                    )}
-                </section>
-                { filterOpen &&  (
-                    <div className='absolute bg-primary/50 backdrop-blur-sm left-0 z-20 top-0 right-0 bottom-0 laptop:hidden'/>
+                        <div className='fixed bg-primary/50 backdrop-blur-sm left-0 z-40 top-0 right-0 bottom-0'/>
+                    </div>
                 )}
-                { showBookingForm && (
-                    <div className='absolute bg-primary/50 backdrop-blur-sm left-0 z-40 top-0 right-0 bottom-0'/>
-                )}
+                <Footer/>
             </main>
-            <Footer/>
-        </>
     );
 }

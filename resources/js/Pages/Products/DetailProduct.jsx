@@ -51,7 +51,7 @@ export default function DetailProduct() {
     
 
     return (
-        <>
+        <main>
             <Navbar/>
             <article className="section-container laptop:mt-10 gap-8">
 
@@ -251,14 +251,6 @@ export default function DetailProduct() {
                     </button>
                 </div> */}
 
-                {showBookingForm && (
-                    <BookingForms
-                        product={product}
-                        onClose={handleCloseForm}
-                        isAddToCart={isAddToCart}
-                    />
-                )}
-
                 {/* Bagian Ulasan */}
                 {/* <div className="mt-8">
                     <h2 className="text-xl font-bold mb-4">Product Reviews</h2>
@@ -287,8 +279,15 @@ export default function DetailProduct() {
             
             <Footer />
             { showBookingForm && (
-                <div className='fixed bg-primary/50 backdrop-blur-sm left-0 z-40 top-0 right-0 bottom-0'/>
+                <div>
+                    <BookingForms
+                        product={product}
+                        onClose={handleCloseForm}
+                        isAddToCart={isAddToCart}
+                    />
+                    <div className='fixed bg-primary/50 backdrop-blur-sm left-0 z-40 top-0 right-0 bottom-0'/>
+                </div>
             )}
-        </>
+        </main>
     );
 }
