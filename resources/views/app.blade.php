@@ -23,7 +23,7 @@
         </script>
     </head>
     <body class="font-sans antialiased">
-        <div class="mx-auto w-fit">
+        <div class="mx-auto w-full">
             @inertia
         </div>
     </body>

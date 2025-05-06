@@ -20,7 +20,7 @@ const CardProduct = ({productName, productPrice, productId, productImage, bookNo
         <h2 className='text-white text-xs hidden laptop:block'>Pilihan Terbaik</h2>
       </div>
 
-      <img src={`/storage/${productImage.find(img => img.is_primary).image_path}`} alt="" className='lg:w-[149px] lg:h-[133px]'/>
+      <img src={`/storage/${productImage.find(img => img.is_primary).image_path}`} alt="" className='lg:h-[133px]'/>
       </Link>
 
       <div className='flex flex-col mt-2 gap-4 min-w-full'>

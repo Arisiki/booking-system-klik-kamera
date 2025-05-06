@@ -7,16 +7,22 @@
 @layer components {
   .section-container {
     max-width: 1440px;
-    margin-left: 50px;
-    margin-right: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 50px;
+    padding-right: 50px;
     /* min-width: 100dvw; */
+
   }
 
 
   @media screen and (max-width:640px) {
     .section-container{
-      margin-left: 20px;
-      margin-right: 20px;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 20px;
+      padding-right: 20px;
+
     }
   }
 }

@@ -49,8 +49,9 @@ const Navbar = () => {
 
 
   return (
-    <nav className='border-b pb-3 section-container'>
-      <div className='flex justify-between w-full gap-10 pt-4'>
+    <>
+    <nav className='pb-3 absolute top-0 left-0 right-0 z-20'>
+      <div className='flex justify-between gap-10 pt-4 section-container lg:mx-auto'>
         <button onClick={() => setIsNavOpen(true)} className='w-10 h-10 flex items-center justify-center rounded-md bg-acccent md:hidden'>
           <img src="/icons/Burger.svg" alt="hamburger-menu" className=''/>
         </button>
@@ -90,8 +91,10 @@ const Navbar = () => {
           )}
         </div>
       </div>
-      
     </nav>
+    <hr className='xl:hidden absolute left-0 right-0 top-[70px]'/>
+    <div className='my-8 bg-red-200 opacity-0 z-100'>nav</div>
+    </>
   )
 }
 

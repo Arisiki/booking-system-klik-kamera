@@ -57,7 +57,7 @@ export default function DetailProduct() {
 
                 <div className='flex flex-col gap-6 laptop:flex-row laptop:justify-between' >
                     <section className='w-full flex flex-col gap-2 md:flex-row md:gap-4 laptop:w-1/2 laptop:justify-bertween items-center laptop:items-start'>
-                        <img src={`/storage/${activeImage}`} alt="" className='h-80 md:h-[404px] rounded-xl md:order-2 w-[361px] object-cover md:w-[531px] laptop:w-4/5' />
+                        <img src={`/storage/${activeImage}`} alt="" className='rounded-xl md:order-2 w-[361px] object-cover md:w-[531px] laptop:w-4/5 h-fit' />
                         <div className='flex flex-row md:flex-col gap-4 justify-around w-full md:justify-start md:w-fit'>
                             {productImages.map((img) => (
                                 <button
