@@ -93,20 +93,26 @@ const Home = () => {
             {/* Products Recomentadion Section */}
             <section className='bg-primary py-12 md:py-12 flex flex-col gap-4 md:gap-8 '>
               <h1 className='text-white text-2xl md:text-3xl text-center font-semibold'>REKOMENDASI BUAT KAMU</h1>
-                <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8 section-container w-full'>
-                  {products.map((product) => (
-                    <CardProduct
-                      key={product.id}
-                      product={product}
-                      productName={product.name}
-                      productPrice={product.price_per_day}
-                      bookNow={() => handleBooking(product, false)}
-                      addToCart={() => handleBooking(product, true)}
-                      productId={product.id}
-                      productImage={product.images}
-                    />
-                  ))}
-                </div>
+                {products && products.length > 0 ? (
+                  <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8 section-container w-full'>
+                    {products.map((product) => (
+                      <CardProduct
+                        key={product.id}
+                        product={product}
+                        productName={product.name}
+                        productPrice={product.price_per_day}
+                        bookNow={() => handleBooking(product, false)}
+                        addToCart={() => handleBooking(product, true)}
+                        productId={product.id}
+                        productImage={product.images}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className='section-container flex flex-col items-center justify-center py-8 bg-white/10 rounded-lg'>
+                    <p className='text-white text-lg mb-4'>Produk belum tersedia/belum ditambahkan oleh admin.</p>
+                  </div>
+                )}
             </section>
 
             {/* Review section */}

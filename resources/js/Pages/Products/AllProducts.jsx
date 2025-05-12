@@ -95,9 +95,9 @@ export default function AllProducts() {
                             />
                         </div> */}
 
-
-                        <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8 md:gap-4'>
-                            {products.map(product => (
+                        {products && products.length > 0 ? (
+                            <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8 md:gap-4'>
+                                {products.map(product => (
                                     <CardProduct
                                         key={product.id}
                                         product={product}
@@ -108,8 +108,14 @@ export default function AllProducts() {
                                         productId={product.id}
                                         productImage={product.images}
                                     />
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-12 bg-gray-100 rounded-lg">
+                                <p className="text-gray-700 text-lg mb-4">Produk belum tersedia/belum ditambahkan oleh admin.</p>
+                            </div>
+                        )}
+
                     </div>
                 </section>
                 

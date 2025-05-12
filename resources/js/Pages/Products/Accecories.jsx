@@ -28,20 +28,27 @@ export default function Accecories() {
         <main>
         <Navbar />
           <article className='section-container mt-4'>
-          <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 laptop:grid-cols-5 gap-8'>
-              {products.map(product => (
-                      <CardProduct
-                          key={product.id}
-                          product={product}
-                          productName={product.name}
-                          productPrice={product.price_per_day}
-                          bookNow={() => handleBooking(product, false)}
-                          addToCart={() => handleBooking(product, true)}
-                          productId={product.id}
-                          productImage={product.images}
-                      />
-              ))}
-          </div>
+          {products && products.length > 0 ? (
+                <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 laptop:grid-cols-5 gap-8'>
+                    {products.map(product => (
+                            <CardProduct
+                                key={product.id}
+                                product={product}
+                                productName={product.name}
+                                productPrice={product.price_per_day}
+                                bookNow={() => handleBooking(product, false)}
+                                addToCart={() => handleBooking(product, true)}
+                                productId={product.id}
+                                productImage={product.images}
+                            />
+                    ))}
+                </div>
+             ) : (
+                <div className="flex flex-col items-center justify-center py-12 bg-gray-100 rounded-lg">
+                    <p className="text-gray-700 text-lg mb-4">Produk belum tersedia/belum ditambahkan oleh admin.</p>
+                </div>
+            )}
+            
 
           {showBookingForm && selectedProduct && (
                   <BookingForms
