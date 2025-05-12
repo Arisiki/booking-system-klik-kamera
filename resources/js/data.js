@@ -116,3 +116,47 @@ export const icons =
       path: '/dji.svg'
     },
   ]
+
+
+  export const testimonials = [
+    {
+      id: 1,
+      name: "Putu",
+      role: "Photographer",
+      image: "/testi-1.png",
+      avatar: "/man-avatar.svg",
+      message: "Booking kamera disini berasa simpel dan cepet banget, punya banyak opsi pembayaran dan kemudahan dengan sistem home delivery sangat membantu saya, yang seorang freelance fotographer."
+    },
+    {
+      id: 2,
+      name: "Made",
+      role: "Videographer",
+      image: "/testi-2.png",
+      avatar: "/man-avatar.svg",
+      message: "Koleksi kamera dan lensa yang lengkap, kondisi alat terawat dengan baik. Proses QC yang detail bikin tenang waktu sewa peralatan untuk project penting."
+    },
+    {
+      id: 3,
+      name: "Kadek",
+      role: "Content Creator",
+      image: "/testi-3.png",
+      avatar: "/man-avatar.svg",
+      message: "Perfect buat content creator yang butuh peralatan berbeda-beda. Harga terjangkau dan staff yang sangat membantu dalam memilih peralatan yang tepat."
+    },
+    {
+      id: 4,
+      name: "Nyoman",
+      role: "Wedding Photographer",
+      image: "/testi-4.png",
+      avatar: "/man-avatar.svg",
+      message: "Sudah berlangganan sejak lama untuk project wedding. Peralatan selalu dalam kondisi prima dan backup unit tersedia jika dibutuhkan. Sangat recommended!"
+    },
+    {
+      id: 5,
+      name: "Wayan",
+      role: "Film Student",
+      image: "/testi-5.png",
+      avatar: "/woman-avatar.svg",
+      message: "Sebagai mahasiswa film, tempat ini jadi go-to place untuk sewa peralatan. Harga bersahabat dengan kantong mahasiswa dan pilihan peralatan yang update."
+    }
+  ];

@@ -1,12 +1,13 @@
 import BookingSekarangIcon from '@/Components/BookingSekarangIcon'
 import Button from '@/Components/Button'
 import CardProduct from '@/Components/CardProduct'
-import { brandLogos } from '@/data'
+import { brandLogos, testimonials } from '@/data'
 import Footer from '@/Layouts/Footer'
 import Navbar from '@/Layouts/Navbar'
 import { router, usePage } from '@inertiajs/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import BookingForms from './Bookings/BookingForms'
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const Home = () => {
   const { products } = usePage().props;
@@ -14,6 +15,7 @@ const Home = () => {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isAddToCart, setIsAddToCart] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const user = usePage().props.auth.user;
 
@@ -28,8 +30,30 @@ const Home = () => {
       setShowBookingForm(false);
       setSelectedProduct(null);
   };
-  
 
+  useEffect(() => {
+    const timer = 
+      setInterval(() => {
+        setCurrentTestimonial((prev) =>
+          prev === testimonials.length - 1 ? 0 : prev + 1
+        )
+      }, 5000);
+
+      return () => clearInterval(timer);
+  }, [])
+  
+  const handleNextTestimonial = (direction) => {
+    if(direction === 'right') {
+      setCurrentTestimonial((prev) => 
+        prev === testimonials.length - 1 ? 0 : prev + 1
+      )
+    } else if (direction === 'left') {
+      setCurrentTestimonial((prev) =>
+        prev === 0 ? testimonials.length - 1 : prev - 1
+      )
+    }
+  }
+  
   return (
       <main>
         <Navbar/>
@@ -43,7 +67,7 @@ const Home = () => {
                   <h1 className='text-primary text-[38px] leading-10 font-bold md:text-[52px] md:leading-[63px] md:text-center laptop:text-[64px] capitalize'>
                     Tempat sewa kamera terlengkap dan termurah di bali.
                   </h1>
-                  <p className='text-thrid text-sm leading-[17px] md:text-xl md:text-center laptop:max-w-[587px] md:mx-auto laptop:text-2xl'>
+                  <p className='text-thrid text-sm leading-[17px] md:text-xl md:text-center laptop:max-w-[587px] md:mx-auto'>
                     Tersedia semua jenis alat mulai dari Kamera, Lensa dan Aksesoris Lainnya
                   </p>
                 </div>
@@ -59,14 +83,14 @@ const Home = () => {
             <section className='mt-28 md:mt-40 lg:mt-60 bg-[#F1F5F9] py-8'>
               <div className='flex flex-wrap justify-center gap-8 md:justify-between items-center section-container'>
                 {brandLogos.map((brand) => (
-                  <img src={brand.path} alt="" key={brand.name} className='grayscale w-36 opacity-50'/>
+                  <img src={brand.path} alt="" key={brand.name} className='grayscale w-20 md:w-28 laptop:w-36 opacity-50'/>
                 ))}
               </div>
             </section>
 
 
             {/* Products Recomentadion Section */}
-            <section className='bg-primary py-8 md:py-12 flex flex-col gap-4 md:gap-8 '>
+            <section className='bg-primary py-12 md:py-12 flex flex-col gap-4 md:gap-8 '>
               <h1 className='text-white text-2xl md:text-3xl text-center font-semibold'>REKOMENDASI BUAT KAMU</h1>
                 <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8 section-container w-full'>
                   {products.map((product) => (
@@ -83,6 +107,52 @@ const Home = () => {
                   ))}
                 </div>
             </section>
+
+            {/* Review section */}
+            <section className='bg-[#F1F5F9] w-full h-fit py-12'>
+              <div className='flex items-center section-container'>
+                <button onClick={() => handleNextTestimonial('left')}>
+                  <FiChevronLeft className='hidden md:block w-12 h-12 text-primary'/>
+                </button>
+                <div className='flex flex-col laptop:flex-row items-center md:section-container justify-center md:justify-start gap-8 laptop:gap-20'>
+                  <div className='w-full  flex justify-center md:justify-start relative'>
+                    <div className='w-[268px] md:w-[480px] md:h-[480px] h-[268px] overflow-hidden flex items-center rounded-xl'>
+                      <img src={testimonials[currentTestimonial].image} alt="testi-1-image" className='w-full h-full object-cover' />
+                    </div>
+                    <div className='w-[112px] md:w-[189px] md:h-[120px] h-[80px] overflow-hidden rounded-xl p-4 bg-white border-4 border-secondary border-dashed absolute flex items-center right-0 md:-right-10  top-8 md:top-16'>
+                      <img src={testimonials[currentTestimonial].avatar} alt="avatar"  className='absolute top-0 left-0' />
+                    </div>
+                  </div>
+                  
+                  <div className='flex flex-col items-center  gap-4 md:items-start'>
+                      <h1 className='uppercase text-xl font-semibold'>APA KATA MEREKA</h1>
+                      <p className='text-lg md:text-2xl text-thrid text-center md:text-start'>
+                        {testimonials[currentTestimonial].message}
+                      </p>
+                      <div className='text-center md:text-start'>
+                        <h2 className='text-dark'>{testimonials[currentTestimonial].name}</h2>
+                        <span className='text-dark font-bold'>{testimonials[currentTestimonial].role}</span>
+                      </div>
+                      <div className='flex gap-3 mt-10'>
+                        {testimonials.map((_, i) => (
+                          <button
+                            key={i}
+                            className={`transition-all ${i === currentTestimonial ? 'w-8 bg-primary' : 'w-2 bg-thrid/40'} h-2 rounded-full`}
+                            onClick={() => setCurrentTestimonial(i)}
+                          />
+                        ))}
+                      </div>
+                  </div>
+                </div>
+                <button onClick={() => handleNextTestimonial('right')}>
+                  <FiChevronRight className='hidden md:block w-12 h-12 text-primary'/>
+                </button>
+              </div>
+            </section>
+
+           
+
+
           </article>
           { showBookingForm && selectedProduct && (
               <div>
