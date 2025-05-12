@@ -160,3 +160,23 @@ export const icons =
       message: "Sebagai mahasiswa film, tempat ini jadi go-to place untuk sewa peralatan. Harga bersahabat dengan kantong mahasiswa dan pilihan peralatan yang update."
     }
   ];
+
+
+  export const orderProcess = [
+    {
+      title: 'Pilih Kamera atau Aksesoris yang ingin di booking',
+      description: 'Di semua product atau di bagian tab kamera dan aksesoris kalian bisa memilih alat yang diinginkan, setelah itu bisa memilih opsi antara book now untuk langsung, atau mau add to cart dulu untuk booking banyak alat.'
+    },
+    {
+      title: 'Isi booking form',
+      description: 'Lengkapi semua informasi yang diperlukan pada form pemesanan, termasuk tanggal mulai dan selesai sewa, serta metode pengambilan.'
+    },
+    {
+      title: 'Lakukan pembayaran',
+      description: 'Pilih metode pembayaran yang tersedia dan selesaikan transaksi untuk mengkonfirmasi pemesanan Anda.'
+    },
+    {
+      title: 'Selesai',
+      description: 'Pemesanan Anda telah dikonfirmasi. Anda dapat mengambil atau menerima peralatan sesuai dengan metode yang dipilih.'
+    }
+  ];

@@ -1,7 +1,7 @@
 import BookingSekarangIcon from '@/Components/BookingSekarangIcon'
 import Button from '@/Components/Button'
 import CardProduct from '@/Components/CardProduct'
-import { brandLogos, testimonials } from '@/data'
+import { brandLogos, orderProcess, testimonials } from '@/data'
 import Footer from '@/Layouts/Footer'
 import Navbar from '@/Layouts/Navbar'
 import { router, usePage } from '@inertiajs/react'
@@ -75,6 +75,7 @@ const Home = () => {
                 <Button
                   title={'Lihat Semua Produk'}
                   className={'px-[35px] py-[17px] bg-primary text-white font-bold rounded-xl max-w-[299px] md:mx-auto md:text-xl laptop:text-2xl laptop:py-6 laptop:px-10 laptop:max-w-fit'}
+                  to={'/products'}
                 />
               </div>
             </section>
@@ -150,7 +151,40 @@ const Home = () => {
               </div>
             </section>
 
-           
+            {/* How to booking */}
+            <section className='py-12'>
+              <div className='section-container flex flex-col gap-8 laptop:gap-16'>
+                <div className='text-center flex flex-col gap-4'>
+                  <h1 className='text-2xl md:text-3xl laptop:text-4xl uppercase font-bold'>Cara Booking Yang Simpel</h1>
+                  <p className='text-third md:text-lg'>Langkah-langkah booking di Klik Kamera</p>
+                </div>
+
+                <div className='flex flex-col md:flex-row md:items-start w-full gap-6 md:gap-16'>
+                  <img src="/phone.svg" alt="" className='md:w-1/2 laptop:max-w-[617px]' />
+                  <div className='flex flex-col gap-4 md:gap-6 laptop:gap-8'>
+                    {orderProcess.map((proces) => (
+                      <details className='border-l-4 pl-4 border-third group transition-all duration-300 [&[open]]:border-primary'>
+                        <summary className='text-lg md:text-xl laptop:text-2xl font-semibold list-none cursor-pointer'>
+                          {proces.title}
+                        </summary>
+                        <p className='text-thrid mt-2'>
+                          {proces.description}
+                        </p>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+                  
+                <div className='w-full relative text-center'>
+                  <BookingSekarangIcon className={'hidden md:block absolute bottom-12 right-24 laptop:right-[300px]'}/>
+                  <Button
+                    title={'Lihat Semua Produk'}
+                    className={'px-[35px] py-[17px] bg-primary text-white font-bold rounded-xl max-w-[299px] md:mx-auto md:text-xl laptop:text-2xl laptop:py-6 laptop:px-10 laptop:max-w-fit'}
+                    to={'/products'}
+                  />
+                </div>
+              </div>
+            </section>
 
 
           </article>
