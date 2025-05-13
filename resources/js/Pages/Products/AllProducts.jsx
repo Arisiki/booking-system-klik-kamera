@@ -74,7 +74,7 @@ export default function AllProducts() {
                         />
                     )}
 
-                    <div className='flex flex-col gap-3'>
+                    <div className='flex flex-col gap-3 w-full'>
 
                         <div className='flex justify-between'>
                             <h1 className='font-bold text-lg text-primary md:text-xl laptop:text-2xl'>

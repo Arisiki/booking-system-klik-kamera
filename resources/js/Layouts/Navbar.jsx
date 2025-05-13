@@ -1,13 +1,17 @@
 import IconPlaceholder from '@/Components/IconPlaceholder';
-import { Link, usePage } from '@inertiajs/react';
-import React, { useEffect, useState } from 'react'
+import { Link, router, usePage } from '@inertiajs/react';
+import React, { useEffect, useState, useRef } from 'react'
 import { icons } from '@/data';
 import { IoIosCloseCircle } from "react-icons/io";
+import { FiSearch } from "react-icons/fi";
 
 const Navbar = () => {
   const user = usePage().props.auth.user;
   const { url } = usePage();
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef(null);
   console.log(isNavOpen);
   
   
@@ -33,6 +37,23 @@ const Navbar = () => {
       link: '/about'
     },
   ]
+
+  // Focus search input when search is opened
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchOpen]);
+
+  // Handle search submission
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.get('/products', { search: searchQuery });
+      setIsSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
 
   // useEffect(() => {
   //   const handleResize = () => {
@@ -75,7 +96,46 @@ const Navbar = () => {
         </div>
 
         <div className='flex gap-2 items-center'>
-          <IconPlaceholder iconImage={icons.search.path} altImage={icons.search.name}/>
+          {/* Search functionality */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)} 
+              className="w-10 h-10 flex items-center justify-center rounded-md bg-acccent"
+            >
+              <img 
+                src={icons.search.path} 
+                alt={icons.search.name} 
+                className={`${isSearchOpen ? 'opacity-0' : 'opacity-100'}`}
+              />
+            </button>
+            
+            <div className={`absolute right-0 top-0 flex items-center transition-all duration-300 ${isSearchOpen ? 'w-[240px] md:w-64 laptop:w-80 lg:w-96 opacity-100' : 'w-0 opacity-0 pointer-events-none'}`}>
+              <form onSubmit={handleSearch} className="flex w-full">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Cari nama produk..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Escape' && setIsSearchOpen(false)}
+                  className="w-full px-4 py-2 rounded-l-md border border-gray-300 focus:outline-none focus:ring-0 ring-primary"
+                />
+                <button 
+                  type="submit" 
+                  className="px-3 py-2 bg-primary text-white rounded-r-md hover:bg-primary/90"
+                >
+                  <FiSearch className="w-5 h-5" />
+                </button>
+              </form>
+              <button 
+                onClick={() => setIsSearchOpen(false)} 
+                className="absolute right-10 p-2 text-red-500 hover:text-red-700"
+              >
+                <IoIosCloseCircle className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+          
           <IconPlaceholder iconImage={icons.cart.path} altImage={icons.cart.name} link="/cart"/>
           {!user ? (
             <div>
