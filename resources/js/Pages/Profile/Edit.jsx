@@ -7,7 +7,7 @@ import Footer from '@/Layouts/Footer';
 
 export default function Edit({ mustVerifyEmail, status }) {
     return (
-        <main className="relative mb-0">
+        <main className=" mb-0">
             <Head title="Profile" />
             <Navbar />
             
