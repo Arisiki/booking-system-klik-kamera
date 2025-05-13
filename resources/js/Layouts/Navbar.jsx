@@ -7,13 +7,14 @@ import { FiSearch } from "react-icons/fi";
 
 const Navbar = () => {
   const user = usePage().props.auth.user;
-  const { url } = usePage();
+  const { url, props } = usePage();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef(null);
-  console.log(isNavOpen);
   
+  // Get cart items count from props if available
+  const cartItemsCount = props.cartItems ? props.cartItems.length : 0;
   
   const navData = [
     {
@@ -136,7 +137,16 @@ const Navbar = () => {
             </div>
           </div>
           
-          <IconPlaceholder iconImage={icons.cart.path} altImage={icons.cart.name} link="/cart"/>
+          {/* Cart icon with item count badge */}
+          <div className="relative">
+            <IconPlaceholder iconImage={icons.cart.path} altImage={icons.cart.name} link="/cart"/>
+            {cartItemsCount > 0 && (
+              <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {cartItemsCount}
+              </div>
+            )}
+          </div>
+          
           {!user ? (
             <div>
               <Link

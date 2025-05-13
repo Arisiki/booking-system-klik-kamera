@@ -41,7 +41,23 @@ export default function Edit({ mustVerifyEmail, status }) {
                             <UpdatePasswordForm className="max-w-xl" />
                         </div>
 
+                        {/* Add new Orders card */}
                         <div className="bg-white p-4 md:p-6 border border-thrid/10 rounded-xl ">
+                            <h2 className="text-xl font-bold text-primary mb-4">
+                                Pesanan Saya
+                            </h2>
+                            <p className="text-thrid mb-4">
+                                Lihat riwayat pesanan dan status pesanan Anda.
+                            </p>
+                            <Link
+                                href={route('orders.show')}
+                                className="px-4 w-fit h-fit py-2 text-sm font-semibold text-white bg-primary rounded-md hover:bg-primary/90 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            >
+                                Lihat Pesanan
+                            </Link>
+                        </div>
+
+                        {/* <div className="bg-white p-4 md:p-6 border border-thrid/10 rounded-xl ">
                             <h2 className="text-xl font-bold text-primary mb-4">
                                 Hapus Akun
                             </h2>
@@ -49,15 +65,24 @@ export default function Edit({ mustVerifyEmail, status }) {
                                 Setelah akun Anda dihapus, semua data dan sumber daya akan dihapus secara permanen.
                             </p>
                             <DeleteUserForm className="max-w-xl" />
+                        </div> */}
+                        <div className="bg-white p-4 md:p-6 border border-thrid/10 rounded-xl ">
+                            <h2 className="text-xl font-bold text-primary mb-4">
+                                Logout
+                            </h2>
+                            <p className="text-thrid mb-4">
+                                Setelah logout anda tidak bisa melakukan pesanan.
+                            </p>
+                            <Link
+                                href={route('logout')}
+                                method="post"
+                                as="button"
+                                className="px-4 w-fit h-fit py-2 text-sm font-semibold text-white bg-red-500 rounded-md hover:bg-red-600 transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            >
+                                Log Out
+                            </Link>
                         </div>
-                        <Link
-                            href={route('logout')}
-                            method="post"
-                            as="button"
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Log Out
-                        </Link>
+                        
                     </div>
             </section>
             

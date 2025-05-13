@@ -70,6 +70,6 @@ class CartHelper
 
   public static function clearCart()
   {
-    session()->forget('cart');
+    // session()->forget('cart');
   }
 }
