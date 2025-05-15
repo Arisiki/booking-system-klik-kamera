@@ -31,7 +31,7 @@ export default function ReviewForm({ order, setReview }) {
                         {[1, 2, 3, 4, 5].map((star) => (
                             <span
                                 key={star}
-                                className={`cursor-pointer text-3xl ${rating >= star ? 'text-yellow-400' : 'text-gray-300'} hover:scale-110 transition-transform`}
+                                className={`cursor-pointer text-4xl ${rating >= star ? 'text-yellow-400' : 'text-gray-300'} hover:scale-110 transition-transform`}
                                 onClick={() => setRating(star)}
                             >
                                 ★

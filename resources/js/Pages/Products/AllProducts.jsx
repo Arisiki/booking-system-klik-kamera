@@ -61,7 +61,7 @@ export default function AllProducts() {
                 <Navbar/>
                 <div className='relative mb-0' >
                 <Head title='Products'/>
-                <section className='section-container mt-4 flex flex-col gap-4 laptop:flex-row justify-between'>
+                <section className='section-container h-[100dvh] mt-4 flex flex-col gap-4 laptop:flex-row justify-between'>
                     {filterOpen && (
                         <Sidebar
                             filters={filters}

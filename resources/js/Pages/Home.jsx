@@ -8,6 +8,7 @@ import { router, usePage } from '@inertiajs/react'
 import React, { useEffect, useState } from 'react'
 import BookingForms from './Bookings/BookingForms'
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useScrollTop } from '@/utils'
 
 const Home = () => {
   const { products } = usePage().props;
@@ -30,6 +31,7 @@ const Home = () => {
       setShowBookingForm(false);
       setSelectedProduct(null);
   };
+  useScrollTop([showBookingForm]);
 
   useEffect(() => {
     const timer = 
@@ -81,7 +83,7 @@ const Home = () => {
             </section>
 
             {/* Brands Section */}
-            <section className='mt-28 md:mt-40 lg:mt-60 bg-[#F1F5F9] py-8'>
+            <section className='mt-28 md:mt-60 lg:mt-80 bg-[#F1F5F9] py-8'>
               <div className='flex flex-wrap justify-center gap-8 md:justify-between items-center section-container'>
                 {brandLogos.map((brand) => (
                   <img src={brand.path} alt="" key={brand.name} className='grayscale w-20 md:w-28 laptop:w-36 opacity-50'/>

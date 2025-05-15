@@ -3,6 +3,7 @@ import { usePage } from '@inertiajs/react';
 import BookingForms from '../Bookings/BookingForms';
 import Navbar from '@/Layouts/Navbar';
 import CardProduct from '@/Components/CardProduct';
+import Footer from '@/Layouts/Footer';
 
 export default function Accecories() {
     const { products, cameraTypes, brand } = usePage().props;
@@ -27,7 +28,7 @@ export default function Accecories() {
     return (
         <main>
         <Navbar />
-          <article className='section-container mt-4'>
+          <article className='section-container h-[100dvh] mt-4'>
           {products && products.length > 0 ? (
                 <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 laptop:grid-cols-5 gap-8'>
                     {products.map(product => (
@@ -58,6 +59,7 @@ export default function Accecories() {
                   />
               )}
           </article>
+          <Footer />
       </main>
     );
 }
