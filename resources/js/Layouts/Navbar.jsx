@@ -34,8 +34,8 @@ const Navbar = () => {
       link: '/products/accecories'
     },
     {
-      name: 'Tentang Kami',
-      link: '/about'
+      name: 'Riwayat Order',
+      link: '/orders'
     },
   ]
 

@@ -63,9 +63,9 @@ const Home = () => {
             {/* Hero section */}
             <section className='w-full mt-4 relative flex md:justify-center laptop:max-w-[891px] laptop:mt-20 section-container'>
               <div className='max-w-[68dvw] flex flex-col gap-8 md:gap-11'>
-                <div className='flex flex-col gap-4 md:gap-5'>
+                <div className='flex flex-col gap-4 md:gap-5 laptop:gap-8'>
                   <h1 className='text-primary text-[38px] leading-10 font-bold md:text-[52px] md:leading-[63px] md:text-center laptop:text-[64px] capitalize'>
-                    Tempat sewa kamera terlengkap dan termurah di bali.
+                    Tempat sewa kamera termurah di bali.
                   </h1>
                   <p className='text-thrid text-sm leading-[17px] md:text-xl md:text-center laptop:max-w-[587px] md:mx-auto'>
                     Tersedia semua jenis alat mulai dari Kamera, Lensa dan Aksesoris Lainnya

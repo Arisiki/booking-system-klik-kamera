@@ -85,7 +85,7 @@ export default function ForgotPassword({ status }) {
                 </p>
             </div>
 
-            <img src="/background.jpg" alt="" className='absolute top-0 object-cover h-full w-full opacity-50 blur-sm' />
+            <img src="/background.jpg" alt="" className='absolute top-0 object-cover h-full w-full opacity-80' />
         </main>
     );
 }
