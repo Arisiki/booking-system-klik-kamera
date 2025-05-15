@@ -86,27 +86,27 @@ export default function OrdersIndex({ orders, filters, statuses }) {
             
             <div className="bg-white rounded-md shadow-sm overflow-hidden">
                 <div className="p-4 border-b">
-                    <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+                    <form onSubmit={handleSearch} className="flex flex-col items-end md:flex-row gap-4">
                         <div className="flex flex-1">
                             <input
                                 type="text"
                                 placeholder="Search by order ID or customer name..."
-                                className="flex-1 border-gray-300 rounded-l-md focus:ring-primary focus:border-primary"
+                                className="flex-1 border-gray-300 h-12 rounded-l-md focus:ring-0 focus:ring-primary focus:border-primary"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-primary text-white rounded-r-md"
+                                className="px-4 py-0 h-12 bg-primary text-white rounded-r-md"
                             >
                                 <FiSearch />
                             </button>
                         </div>
                         
-                        <div className="flex items-center">
+                        <div className="flex items-end">
                             <div className="relative">
                                 <select
-                                    className="appearance-none border border-gray-300 rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-primary focus:border-primary"
+                                    className="appearance-none border h-12 border-gray-300 rounded-md pl-3 pr-10 py-2 focus:outline-none focus:ring-primary focus:border-primary"
                                     value={statusFilter}
                                     onChange={(e) => setStatusFilter(e.target.value)}
                                 >
@@ -117,13 +117,10 @@ export default function OrdersIndex({ orders, filters, statuses }) {
                                         </option>
                                     ))}
                                 </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                    <FiFilter className="text-gray-400" />
-                                </div>
                             </div>
                             
                             {/* Add Date Range Filters */}
-                            <div className="flex items-center gap-2 ml-2">
+                            <div className="flex items-end gap-2 ml-2">
                                 <div>
                                     <label htmlFor="date_from" className="block text-xs text-gray-500">From</label>
                                     <input
@@ -148,7 +145,7 @@ export default function OrdersIndex({ orders, filters, statuses }) {
                             
                             <button
                                 type="submit"
-                                className="ml-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                                className="ml-2 px-4 py-2 h-12 bg-secondary text-white rounded-md hover:bg-secondary/90"
                             >
                                 Filter
                             </button>

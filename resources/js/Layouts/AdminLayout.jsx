@@ -8,10 +8,10 @@ export default function AdminLayout({ children }) {
     const { auth } = usePage().props;
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen">
             {/* Sidebar */}
             <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg">
-                <div className="flex items-center justify-center h-16 px-4 border-b">
+                <div className="flex items-center h-16 px-4 border-b">
                     <ApplicationLogo className="w-12 h-12" />
                     <span className="ml-2 text-xl font-semibold">Klik Kamera</span>
                 </div>
@@ -34,7 +34,7 @@ export default function AdminLayout({ children }) {
                             <FiClipboard className="w-5 h-5 mr-3" />
                             Orders
                         </NavLink>
-                        <NavLink href={route('admin.availability.index')}>
+                        <NavLink href={route('admin.availability.index')} active={route().current('admin.availability.*')}>
                             <FiClipboard className="w-5 h-5 mr-3" />
                             Availability
                         </NavLink>
@@ -68,9 +68,9 @@ export default function AdminLayout({ children }) {
             {/* Main Content */}
             <div className="ml-64">
                 {/* Header */}
-                <header className="flex items-center justify-between h-16 px-6 bg-white shadow">
+                {/* <header className="flex items-center justify-between h-16 px-6 bg-dark text-secondary">
                     <h1 className="text-xl font-semibold">Admin Panel</h1>
-                </header>
+                </header> */}
 
                 {/* Content */}
                 <main className="p-6">
