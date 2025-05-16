@@ -8,7 +8,7 @@ import Footer from '@/Layouts/Footer';
 export default function Cart() {
     const { cartItems, totalCost, auth } = usePage().props;
     const { post, processing, data, setData } = useForm({
-        userName: auth.user.name
+        userName: cartItems.length > 0 ? cartItems[0].user_name : auth.user.name
     }); 
 
     const handleCheckout = () => {
@@ -20,9 +20,7 @@ export default function Cart() {
             onError: (errors) => console.log('Errors:', errors),
         });
     };
-    console.log(cartItems);
     
-
     return (
         <>
             <Navbar />
@@ -50,20 +48,24 @@ export default function Cart() {
                         {/* Personal detail section */}
                         <section className='flex flex-col gap-3' >
                             <h1 className='text-lg font-bold text-primary md:text-2xl'>Data Diri</h1>
-                            <div className='flex gap-6 border border-thrid/10 p-6 rounded-xl text-dark'>
-                                <div className='flex flex-col gap-2'>
-                                    <span>Nama</span>
-                                    <span>No Hp</span>
-                                    <span>Metode</span>
-                                    <span>Alamat</span>
+                            {cartItems.map((item, i) => (
+                                <div key={i} className='flex gap-6 border border-thrid/10 p-6 rounded-xl text-dark mb-3'>
+                                    <div className='flex flex-col gap-2'>
+                                        <span className='font-semibold'>{item.product.name}</span>
+                                        <span>Nama</span>
+                                        <span>No Hp</span>
+                                        <span>Metode</span>
+                                        <span>Alamat</span>
+                                    </div>
+                                    <div className='flex flex-col gap-2'>
+                                        <span>&nbsp;</span>
+                                        <p>{item.user_name}</p>
+                                        <p>{item.phone_number}</p>
+                                        <p>{item.pickup_method}</p>
+                                        <p>{item.pickup_address}</p>
+                                    </div>
                                 </div>
-                                <div className='flex flex-col gap-2'>
-                                    <p>{auth.user.name}</p>
-                                    <p>{cartItems[0].phone_number}</p>
-                                    <p>{cartItems[0].pickup_method}</p>
-                                    <p>{cartItems[0].pickup_address}</p>
-                                </div>
-                            </div>
+                            ))}
                         </section>
 
                         {/* Total Price section */}
@@ -85,7 +87,7 @@ export default function Cart() {
                                     <p>{formatRupiah(totalCost)}</p>
                                 </div>
                             </div>
-                            <button onClick={ handleCheckout} className='w-full bg-primary text-white py-3 rounded-xl'>Checkout</button>
+                            <button onClick={handleCheckout} className='w-full bg-primary text-white py-3 rounded-xl'>Checkout</button>
                         </section>
                     </div>
                 </article>
@@ -93,7 +95,6 @@ export default function Cart() {
                 <p className='h-screen'>Your cart is empty</p>
             )}
             
-
             <Footer />
         </>
     );
