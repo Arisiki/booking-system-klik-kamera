@@ -62,7 +62,7 @@ class BookingController extends Controller
         $request->validate([
             'quantity' => 'required|integer|min:1',
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'pickup_method' => 'required|in:pickup,home_delivery',
             'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
             'userName' => 'required|string|max:25',
@@ -169,41 +169,63 @@ class BookingController extends Controller
         $cartItems = CartHelper::getCart();
 
         if (empty($cartItems)) {
-            return redirect()->route('products.index')->withErrors(['error' => 'Cart is empty.']);
+            return redirect('/cart')->withErrors(['cart' => 'Cart is empty.']);
         }
 
-        $firstItem = $cartItems[0];
+        // Pastikan cartItems adalah array dan memiliki setidaknya satu item
+        if (!is_array($cartItems) || count($cartItems) === 0) {
+            return redirect('/cart')->withErrors(['error' => 'Invalid cart data.']);
+        }
 
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'order_date' => now(),
-            'start_date' => collect($cartItems)->min('start_date'),
-            'end_date' => collect($cartItems)->max('end_date'),
-            'pickup_method' => $firstItem['pickup_method'],
-            'address' => $firstItem['pickup_address'],
-            'user_name' => $firstItem['user_name'],
-            'email' => $firstItem['email'],
-            'phone_number' => $firstItem['phone_number'],
-            'total_cost' => collect($cartItems)->sum('rental_cost'),
-            'status' => 'pending',
-        ]);
+        // Ambil item pertama dari values array jika cartItems adalah associative array
+        $firstItem = is_array(reset($cartItems)) ? reset($cartItems) : $cartItems[0];
 
-        foreach ($cartItems as $item) {
-            OrderItems::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product']['id'],
-                'quantity' => $item['quantity'],
-                'address' => $item['pickup_address'],
-                'pickup_method' => $item['pickup_method'],
-                'rental_cost' => $item['rental_cost'],
+        // Validasi data yang diperlukan
+        if (!isset($firstItem['pickup_method']) || !isset($firstItem['pickup_address']) || 
+            !isset($firstItem['user_name']) || !isset($firstItem['email']) || 
+            !isset($firstItem['phone_number'])) {
+            return redirect('/cart')->withErrors(['error' => 'Missing required cart data.']);
+        }
+
+        try {
+            $order = Order::create([
+                'user_id' => auth()->id(),
+                'order_date' => now(),
+                'start_date' => collect($cartItems)->min('start_date'),
+                'end_date' => collect($cartItems)->max('end_date'),
+                'pickup_method' => $firstItem['pickup_method'],
+                'address' => $firstItem['pickup_address'],
+                'user_name' => $firstItem['user_name'],
+                'email' => $firstItem['email'],
+                'phone_number' => $firstItem['phone_number'],
+                'total_cost' => collect($cartItems)->sum('rental_cost'),
+                'status' => 'pending',
             ]);
+
+            foreach ($cartItems as $item) {
+                OrderItems::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']['id'],
+                    'quantity' => $item['quantity'],
+                    'address' => $item['pickup_address'],
+                    'pickup_method' => $item['pickup_method'],
+                    'rental_cost' => $item['rental_cost'],
+                ]);
+            }
+
+            // Bersihkan cart setelah checkout berhasil
+            session()->forget('cart');
+
+            // Schedule job untuk membatalkan order jika tidak dibayar dalam 3 jam
+            CancelOrderJob::dispatch($order->id)->delay(now()->addHours(3));
+
+            return redirect()->route('checkout.show', $order->id)
+                ->with('success', 'Order created successfully!');
+
+        } catch (\Exception $e) {
+            Log::error('Checkout Error: ' . $e->getMessage());
+            return redirect('/cart')->withErrors(['error' => 'Failed to process checkout. Please try again.']);
         }
-
-        CancelOrderJob::dispatch($order->id)->delay(now()->addHour(3));
-
-        CartHelper::clearCart();
-
-        return redirect()->route('checkout.show', $order->id)->with('success', 'Order created successfully!');
     }
 
     /**

@@ -47,8 +47,16 @@ class ProductsController extends Controller
     public function show(Product $product)
     {
         $product->load('reviews.user', 'images', 'equipment');
+        
+        $relatedProducts = Product::where('category', $product->category)
+            ->where('id', '!=', $product->id)
+            ->with('images')
+            ->take(3)
+            ->get();
+        
         return Inertia::render('Products/DetailProduct', [
             'product' => $product,
+            'relatedProducts' => $relatedProducts
         ]);
     }
 
