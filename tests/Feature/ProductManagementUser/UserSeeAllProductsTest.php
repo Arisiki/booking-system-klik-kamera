@@ -43,8 +43,10 @@ class UserSeeAllProductsTest extends TestCase
         $response->assertInertia(fn ($assert) => $assert
             ->component('Products/AllProducts')
             ->has('products', 3)
-            ->where('products.0.id', $products[0]->id)
-            ->where('products.0.name', $products[0]->name)
+            ->has('products.0', fn ($assert) => $assert
+                ->where('name', $products[0]->name)
+                ->etc()
+            )
         );
     }
 

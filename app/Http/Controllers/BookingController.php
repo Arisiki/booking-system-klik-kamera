@@ -70,6 +70,8 @@ class BookingController extends Controller
             'phoneNumber' => 'required|numeric'
         ]);
 
+        
+
         try {
             CartHelper::addToCart(
                 $product->id,
@@ -107,11 +109,13 @@ class BookingController extends Controller
 
         // Cek ketersediaan
         if (!$product->isAvailableForDates($request->start_date, $request->end_date)) {
-            return back()->withErrors(['error' => 'Product is not available for the selected dates.']);
+            // Ubah ini untuk menambahkan key spesifik
+            return back()->withErrors(['quantity' => 'Product is not available for the selected dates.']);
         }
-
+    
         if ($request->quantity > $product->stock) {
-            return back()->withErrors(['error' => 'Requested quantity exceeds available stock.']);
+            // Ubah ini untuk menambahkan key spesifik
+            return back()->withErrors(['quantity' => 'Requested quantity exceeds available stock.']);
         }
 
         // Hitung biaya

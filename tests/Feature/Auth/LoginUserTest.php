@@ -27,7 +27,9 @@ class LoginUserTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('home'));
+        // Periksa role user sebelum menentukan redirect
+        $expectedRedirect = $user->role === 'admin' ? route('admin.dashboard') : route('home');
+        $response->assertRedirect($expectedRedirect);
     }
 
     public function test_users_can_not_authenticate_with_invalid_password()
