@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, router } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
-import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
 import { formatRupiah } from '@/utils';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
-import { format, subDays, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar} from 'recharts';
+import { format, subDays, parseISO,} from 'date-fns';
 import { id } from 'date-fns/locale';
 
 export default function Dashboard({ stats, recentSales, dailyRevenue }) {
@@ -58,11 +56,11 @@ export default function Dashboard({ stats, recentSales, dailyRevenue }) {
         <AdminLayout>
             <Head title="Admin Dashboard" />
             
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-semibold text-dark">Dashboard</h1>
                 
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
+                <div className="flex gap-4 items-center">
+                    <div className="flex gap-2 items-center">
                         <input
                             type="date"
                             name="start"
@@ -80,11 +78,11 @@ export default function Dashboard({ stats, recentSales, dailyRevenue }) {
                         />
                     </div>
                     
-                    <Button onClick={handleApplyFilter} variant="default" className="bg-secondary px-4 py-2 text-white hover:bg-secondary/90">
+                    <Button onClick={handleApplyFilter} variant="default" className="px-4 py-2 text-white bg-secondary hover:bg-secondary/90">
                         Terapkan
                     </Button>
                     
-                    <Button onClick={handleDownload} variant="default" className="bg-primary px-4 py-2 text-white hover:bg-primary/90">
+                    <Button onClick={handleDownload} variant="default" className="px-4 py-2 text-white bg-primary hover:bg-primary/90">
                         Download
                     </Button>
                 </div>
@@ -92,9 +90,9 @@ export default function Dashboard({ stats, recentSales, dailyRevenue }) {
             
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
-                    <CardHeader className="flex flex-row justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row justify-between pb-2 space-y-0">
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="h-4 w-4 text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 text-primary">
                             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                         </svg>
                     </CardHeader>
@@ -107,9 +105,9 @@ export default function Dashboard({ stats, recentSales, dailyRevenue }) {
                 </Card>
                 
                 <Card>
-                    <CardHeader className="flex flex-row justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row justify-between pb-2 space-y-0">
                         <CardTitle className="text-sm font-medium">Total Pelanggan</CardTitle>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="h-4 w-4 text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 text-primary">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                             <circle cx="9" cy="7" r="4" />
                             <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
@@ -124,9 +122,9 @@ export default function Dashboard({ stats, recentSales, dailyRevenue }) {
                 </Card>
                 
                 <Card>
-                    <CardHeader className="flex flex-row justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row justify-between pb-2 space-y-0">
                         <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="h-4 w-4 text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 text-primary">
                             <rect width="20" height="14" x="2" y="5" rx="2" />
                             <path d="M2 10h20" />
                         </svg>
@@ -140,9 +138,9 @@ export default function Dashboard({ stats, recentSales, dailyRevenue }) {
                 </Card>
                 
                 <Card>
-                    <CardHeader className="flex flex-row justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row justify-between pb-2 space-y-0">
                         <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="h-4 w-4 text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 text-primary">
                             <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                         </svg>
                     </CardHeader>
@@ -155,7 +153,7 @@ export default function Dashboard({ stats, recentSales, dailyRevenue }) {
                 </Card>
             </div>
             
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
+            <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
                     <CardHeader>
                         <CardTitle>Overview</CardTitle>
@@ -199,7 +197,7 @@ export default function Dashboard({ stats, recentSales, dailyRevenue }) {
                         <div className="space-y-8">
                             {recentSales.map((sale) => (
                                 <div className="flex items-center" key={sale.id}>
-                                    <Avatar className="h-9 w-9">
+                                    <Avatar className="w-9 h-9">
                                         <AvatarFallback className="bg-primary/10 text-primary">
                                             {sale.customer_name.charAt(0)}
                                         </AvatarFallback>

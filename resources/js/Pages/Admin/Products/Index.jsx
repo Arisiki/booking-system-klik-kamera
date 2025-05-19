@@ -29,25 +29,25 @@ export default function ProductsIndex({ products, filters }) {
                 <h1 className="text-2xl font-semibold">Products Management</h1>
                 <Link
                     href={route('admin.products.create')}
-                    className="px-4 py-2 bg-primary text-white rounded-md flex items-center"
+                    className="flex items-center px-4 py-2 text-white rounded-md bg-primary"
                 >
                     <FiPlus className="mr-2" /> Add Product
                 </Link>
             </div>
             
-            <div className="bg-white rounded-md shadow-sm overflow-hidden">
+            <div className="overflow-hidden bg-white rounded-md shadow-sm">
                 <div className="p-4 border-b">
                     <form onSubmit={handleSearch} className="flex">
                         <input
                             type="text"
                             placeholder="Search products..."
-                            className="flex-1 border-gray-300 rounded-l-md focus:ring-primary focus:border-primary"
+                            className="flex-1 rounded-l-md border-gray-300 focus:ring-primary focus:border-primary"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-primary text-white rounded-r-md"
+                            className="px-4 py-2 text-white rounded-r-md bg-primary"
                         >
                             <FiSearch />
                         </button>
@@ -58,22 +58,22 @@ export default function ProductsIndex({ products, filters }) {
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                     Image
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                     Name
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                     Category
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                     Price/Day
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                     Stock
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                     Actions
                                 </th>
                             </tr>
@@ -86,7 +86,7 @@ export default function ProductsIndex({ products, filters }) {
                                             <img
                                                 src={`/storage/${product.images.find(img => img.is_primary).image_path}`}
                                                 alt={product.name}
-                                                className="h-12 w-12 object-cover rounded"
+                                                className="object-cover w-12 h-12 rounded"
                                             />
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -109,7 +109,7 @@ export default function ProductsIndex({ products, filters }) {
                                                 {product.stock}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                             <div className="flex space-x-2">
                                                 <Link
                                                     href={route('admin.products.edit', product.id)}
@@ -140,7 +140,7 @@ export default function ProductsIndex({ products, filters }) {
                 
                 {products.links && (
                     <div className="px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
-                        <div className="flex items-center justify-between">
+                        <div className="flex justify-between items-center">
                             <div className="text-sm text-gray-700">
                                 Showing {products.from} to {products.to} of {products.total} products
                             </div>
