@@ -10,11 +10,15 @@ const appName = import.meta.env.VITE_APP_NAME || 'Klik Kamera';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : `${appName}`),
-    resolve: (name) =>
-        resolvePageComponent(
+    resolve: (name) => {
+        // Tambahkan caching untuk komponen
+        const cachedComponents = {};
+        
+        return (cachedComponents[name] = cachedComponents[name] || resolvePageComponent(
             `./Pages/${name}.jsx`,
             import.meta.glob('./Pages/**/*.jsx'),
-        ),
+        ));
+    },
     setup({ el, App, props }) {
         const AppWithMidtrans = () => {
             useEffect(() => {

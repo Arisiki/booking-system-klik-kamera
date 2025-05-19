@@ -99,7 +99,7 @@ class BookingController extends Controller
         $request->validate([
             'quantity' => 'required|integer|min:1',
             'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'pickup_method' => 'required|in:pickup,home_delivery',
             'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
             'userName' => 'required|string|max:25',

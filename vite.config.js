@@ -11,4 +11,20 @@ export default defineConfig({
         }),
         react(),
     ],
+    
+    build: {
+        minify: true, // Pastikan minifikasi diaktifkan
+        cssMinify: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: [
+                        'react',
+                        'react-dom',
+                        '@inertiajs/react',
+                    ],
+                },
+            },
+        },
+    },
 });

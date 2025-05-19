@@ -17,25 +17,25 @@ const CardProduct = ({productName, productPrice, productId, productImage, bookNo
       <div className='absolute flex top-0 left-4 w-fit h-fit p-[10px] bg-secondary rounded-b-lg gap-1'>
         <img src={icons.bestPick.path} alt={icons.bestPick.name} />
         <div className='h-[1] w-[1px] bg-white hidden laptop:block'/>
-        <h2 className='text-white text-xs hidden laptop:block'>Pilihan Terbaik</h2>
+        <h2 className='hidden text-xs text-white laptop:block'>Pilihan Terbaik</h2>
       </div>
 
-      <img src={`/storage/${productImage.find(img => img.is_primary).image_path}`} alt="" className='lg:h-[133px]'/>
+      <img src={`/storage/${productImage.find(img => img.is_primary).image_path}`} alt="" className='lg:h-[133px]' loading='lazy'/>
       </Link>
 
-      <div className='flex flex-col mt-2 gap-4 min-w-full'>
+      <div className='flex flex-col gap-4 mt-2 min-w-full'>
         <div className='flex flex-col gap-2'>
-          <h2 className='font-bold text-primary text-lg leading-none lg:text-xl'>{productName}</h2>
-          <h3 className='font-bold text-secondary text-sm leading-none lg:text-base'>{formatRupiah(productPrice)} /Hari</h3>
+          <h2 className='text-lg font-bold leading-none text-primary lg:text-xl'>{productName}</h2>
+          <h3 className='text-sm font-bold leading-none text-secondary lg:text-base'>{formatRupiah(productPrice)} /Hari</h3>
           <hr />
         </div>
 
-        <div className='flex justify-between gap-2'>
-          <button className='bg-primary text-white flex justify-center items-center px-6 py-1 gap-2 rounded-full lg:text-lg font-bold lg:py-2 flex-1' onClick={bookNow}>
+        <div className='flex gap-2 justify-between'>
+          <button className='flex flex-1 gap-2 justify-center items-center px-6 py-1 font-bold text-white rounded-full bg-primary lg:text-lg lg:py-2' onClick={bookNow}>
             Book
             <img src={icons.arrowUp.path} alt={icons.arrowUp.name} className='w-4 h-4'/>
           </button>
-          <button className='w-8 h-8 rounded-full border border-primary flex justify-center items-center lg:w-11 lg:h-11' onClick={addToCart}>
+          <button className='flex justify-center items-center w-8 h-8 rounded-full border border-primary lg:w-11 lg:h-11' onClick={addToCart}>
             <img src={icons.addCart.path} alt={icons.addCart.name} className='w-5 h-5 lg:h-7 lg:w-7' />
           </button>
         </div>

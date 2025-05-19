@@ -7,9 +7,9 @@ import { Link } from '@inertiajs/react'
 const Footer = () => {
 
   return (
-    <footer className='w-full bg-dark absolute left-0 right-0 text-white py-4 md:py-8 mt-8'>
+    <footer className='absolute right-0 left-0 py-4 mt-8 w-full text-white bg-dark md:py-8'>
       <div className='section-container lg:mx-auto'>
-        <div className='flex flex-col gap-14 md:flex-row w-full'>
+        <div className='flex flex-col gap-14 w-full md:flex-row'>
           <div className='flex flex-col gap-2 md:w-1/2 md:gap-4 lg:w-1/3'>
             <h1 className='font-bold text-[32px] md:text-4xl'>Klik Kamera</h1>
             <p className='text-base text-[#B9B3B3] md:text-lg'>
@@ -20,7 +20,7 @@ const Footer = () => {
                 <IconPlaceholder
                   key={icon.name}
                   iconImage={icon.path}
-                  altImage={icon.image}
+                  altImage={icon.name}
                   background='bg-thrid'
                   className='hover:bg-primary'
                 />
@@ -30,7 +30,7 @@ const Footer = () => {
 
           <div className='flex flex-col gap-8 md:w-1/2 lg:flex-row lg:w-2/3 lg:gap-16'>
             <div className='flex flex-col gap-2'>
-              <h2 className='font-semibold text-lg md:text-xl'>Company</h2>
+              <h2 className='text-lg font-semibold md:text-xl'>Company</h2>
               <div className='flex flex-col text-sm text-[#B9B3B3] gap-5 md:text-base'>
                 {company.map((item) => (
                   <Link
@@ -44,7 +44,7 @@ const Footer = () => {
               </div>
             </div>
             <div className='flex flex-col gap-2'>
-              <h2 className='font-semibold text-lg md:text-xl'>Help</h2>
+              <h2 className='text-lg font-semibold md:text-xl'>Help</h2>
               <div className='flex flex-col text-sm text-[#B9B3B3] gap-5 md:text-base'>
                 {help.map((item) => (
                   <Link
@@ -58,8 +58,8 @@ const Footer = () => {
               </div>
             </div>
             <div className='flex flex-col gap-2 lg:flex-1 lg:gap-4'>
-              <h2 className='font-semibold text-lg md:text-xl'>Subscribe to Newsletter</h2>
-              <div className='overflow-hidden rounded-md w-full'>
+              <h2 className='text-lg font-semibold md:text-xl'>Subscribe to Newsletter</h2>
+              <div className='overflow-hidden w-full rounded-md'>
                 <input
                   type="email"
                   className='text-primary border-none w-[80%] py-3'

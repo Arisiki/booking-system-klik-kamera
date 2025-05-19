@@ -2,14 +2,15 @@ import { Link } from '@inertiajs/react'
 import React from 'react'
 
 const IconPlaceholder = ({iconImage, link, background, className, altImage}) => {
-  
   return (
     <Link
-    href={link}
+      href={link}
+      name={altImage}
+      aria-label={altImage || "Navigation link"} 
       className={`w-10 h-10 ${background ?? 'bg-acccent'} flex items-center justify-center rounded-md ${className}`}
     >
       {typeof(iconImage) === 'string'
-        ?  <img src={iconImage} alt={altImage} />
+        ? <img src={iconImage} alt={altImage || ""} />
         : iconImage
       }
     </Link>

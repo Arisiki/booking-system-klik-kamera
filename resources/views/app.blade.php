@@ -21,6 +21,8 @@
         <script>
             window.googleMapsApiKey = "{{ config('services.googleMapsApiKey') }}";
         </script>
+        <link rel="preload" href="/image-1.svg" as="image" />
+        <link rel="preload" href="/image-2.svg" as="image" />
     </head>
     <body class="font-sans antialiased">
         <div class="mx-auto w-full">
