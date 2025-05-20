@@ -46,6 +46,35 @@ class ProductController extends Controller
         ]);
     }
 
+    private function copyToPublicHtml($path)
+    {
+        try {
+            // Path sumber file di storage
+            $sourcePath = storage_path('app/public/' . $path);
+            
+            // Path tujuan di public_html
+            $destinationPath = base_path('../public_html/storage/' . $path);
+            
+            // Pastikan direktori tujuan ada
+            $destinationDir = dirname($destinationPath);
+            if (!file_exists($destinationDir)) {
+                mkdir($destinationDir, 0755, true);
+            }
+            
+            // Copy file
+            if (file_exists($sourcePath)) {
+                copy($sourcePath, $destinationPath);
+                chmod($destinationPath, 0644);
+                return true;
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            \Log::error('Failed to copy file to public_html: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function store(Request $request)
     {
         try {
@@ -94,6 +123,9 @@ class ProductController extends Controller
                         ]);
 
                         $path = $imageFile->store('products', 'public');
+                        
+                        // Copy file ke public_html/storage
+                        $this->copyToPublicHtml($path);
                         
                         $product->images()->create([
                             'image_path' => $path,
@@ -191,6 +223,9 @@ class ProductController extends Controller
                 foreach ($request->file('images') as $imageFile) {
                     $path = $imageFile->store('products', 'public');
                     
+                    // Copy file ke public_html/storage
+                    $this->copyToPublicHtml($path);
+                    
                     $product->images()->create([
                         'image_path' => $path,
                         'is_primary' => $product->images()->count() === 0, 
@@ -208,7 +243,14 @@ class ProductController extends Controller
     {
         // Delete associated images
         foreach ($product->images as $image) {
+            // Hapus file dari storage
             Storage::disk('public')->delete($image->image_path);
+            
+            // Hapus file dari public_html/storage
+            $publicPath = base_path('../public_html/storage/' . $image->image_path);
+            if (file_exists($publicPath)) {
+                unlink($publicPath);
+            }
         }
         
         $product->delete();
