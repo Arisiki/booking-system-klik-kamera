@@ -250,9 +250,9 @@ class BookingController extends Controller
 
         // Payment Gateway (Midtrans)
         \Midtrans\Config::$serverKey = config('midtrans.serverKey');
-        \Midtrans\Config::$isProduction = false;
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
+        \Midtrans\Config::$isProduction = config('midtrans.isProduction');
+        \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
+        \Midtrans\Config::$is3ds = config('midtrans.is3ds');
 
         $params = array(
             'transaction_details' => array(
@@ -294,9 +294,9 @@ class BookingController extends Controller
             }
 
             \Midtrans\Config::$serverKey = $serverKey;
-            \Midtrans\Config::$isProduction = false;
-            \Midtrans\Config::$isSanitized = true;
-            \Midtrans\Config::$is3ds = true;
+            \Midtrans\Config::$isProduction = config('midtrans.isProduction');
+            \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
+            \Midtrans\Config::$is3ds = config('midtrans.is3ds');
 
             try {
                 $notification = new \Midtrans\Notification();
