@@ -242,6 +242,8 @@ class QualityControlChecksController extends Controller
 
         // Simpan hasil QC untuk setiap produk
         foreach ($request->results as $result) {
+            $isDamaged = $result['status'] !== 'Layak Digunakan';
+            
             QualityControlChecks::create([
                 'order_id' => $order->id,
                 'product_id' => $result['product_id'],
@@ -252,6 +254,7 @@ class QualityControlChecksController extends Controller
                 'status' => $result['status'],
                 'notes' => $result['notes'],
                 'condition' => 'Koondisi Bagus',
+                'is_damaged' => $isDamaged,
             ]);
         }
 
