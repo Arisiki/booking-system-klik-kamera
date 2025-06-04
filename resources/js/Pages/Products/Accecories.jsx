@@ -28,9 +28,9 @@ export default function Accecories() {
     return (
         <main>
         <Navbar />
-          <article className='section-container h-[100dvh] mt-4'>
+          <article className='mt-4 section-container'>
           {products && products.length > 0 ? (
-                <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 laptop:grid-cols-5 gap-8'>
+                <div className='grid grid-cols-2 gap-8 minitab:grid-cols-3 md:grid-cols-4 laptop:grid-cols-5'>
                     {products.map(product => (
                             <CardProduct
                                 key={product.id}
@@ -45,8 +45,8 @@ export default function Accecories() {
                     ))}
                 </div>
              ) : (
-                <div className="flex flex-col items-center justify-center py-12 bg-gray-100 rounded-lg">
-                    <p className="text-gray-700 text-lg mb-4">Produk belum tersedia/belum ditambahkan oleh admin.</p>
+                <div className="flex flex-col justify-center items-center py-12 bg-gray-100 rounded-lg">
+                    <p className="mb-4 text-lg text-gray-700">Produk belum tersedia/belum ditambahkan oleh admin.</p>
                 </div>
             )}
             
