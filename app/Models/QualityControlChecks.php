@@ -19,7 +19,6 @@ class QualityControlChecks extends Model
         'status',
         'notes',
         'condition',
-        'is_damaged'
     ];
 
     protected $casts = [

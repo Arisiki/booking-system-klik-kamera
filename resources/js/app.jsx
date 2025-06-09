@@ -23,7 +23,7 @@ createInertiaApp({
         const AppWithMidtrans = () => {
             useEffect(() => {
                 const script = document.createElement('script');
-                script.src = 'https://app.midtrans.com/snap/snap.js';
+                script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
                 script.setAttribute('data-client-key', props.initialPage.props.clientKey || ''); 
                 script.async = true;
                 document.body.appendChild(script);
