@@ -57,11 +57,11 @@ export default function AllProducts() {
     
 
     return (
-            <main className='h-fit'>
+            <main>
                 <Navbar/>
                 <div className='relative mb-0' >
                 <Head title='Products'/>
-                <section className='flex flex-col gap-4 justify-between mt-4 section-container laptop:flex-row'>
+                <section className='section-container h-[100dvh] mt-4 flex flex-col gap-4 laptop:flex-row justify-between'>
                     {filterOpen && (
                         <Sidebar
                             filters={filters}
@@ -77,7 +77,7 @@ export default function AllProducts() {
                     <div className='flex flex-col gap-3 w-full'>
 
                         <div className='flex justify-between'>
-                            <h1 className='text-lg font-bold text-primary md:text-xl laptop:text-2xl'>
+                            <h1 className='font-bold text-lg text-primary md:text-xl laptop:text-2xl'>
                                 Semua Products
                             </h1>
                             <button className='laptop:hidden' onClick={() => setFilterOpen(true)}>
@@ -96,7 +96,7 @@ export default function AllProducts() {
                         </div> */}
 
                         {products && products.length > 0 ? (
-                            <div className='grid grid-cols-2 gap-8 minitab:grid-cols-3 md:grid-cols-4 md:gap-4'>
+                            <div className='grid grid-cols-2 minitab:grid-cols-3 md:grid-cols-4 gap-8 md:gap-4'>
                                 {products.map(product => (
                                     <CardProduct
                                         key={product.id}
@@ -111,8 +111,8 @@ export default function AllProducts() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-col justify-center items-center py-12 bg-gray-100 rounded-lg">
-                                <p className="mb-4 text-lg text-gray-700">Produk belum tersedia/belum ditambahkan oleh admin.</p>
+                            <div className="flex flex-col items-center justify-center py-12 bg-gray-100 rounded-lg">
+                                <p className="text-gray-700 text-lg mb-4">Produk belum tersedia/belum ditambahkan oleh admin.</p>
                             </div>
                         )}
 
@@ -130,7 +130,7 @@ export default function AllProducts() {
                             onClose={handleCloseForm}
                             isAddToCart={isAddToCart}
                         />
-                        <div className='fixed top-0 right-0 bottom-0 left-0 z-40 backdrop-blur-sm bg-primary/50'/>
+                        <div className='fixed bg-primary/50 backdrop-blur-sm left-0 z-40 top-0 right-0 bottom-0'/>
                     </div>
                 )}
                 <Footer/>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm } from '@inertiajs/react';
 import InputLabel from '@/Components/InputLabel';
@@ -28,49 +28,7 @@ export default function EditProduct({ product }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        // Validate files before upload
-        if (data.images.length > 0) {
-            for (const file of data.images) {
-                if (file.size > 2 * 1024 * 1024) { // 2MB limit
-                    alert(`File ${file.name} is too large. Maximum size is 2MB`);
-                    return;
-                }
-            }
-        }
-
-        // Create FormData
-        const formData = new FormData();
-        Object.keys(data).forEach(key => {
-            if (key === 'images') {
-                data.images.forEach(file => {
-                    formData.append('images[]', file);
-                });
-            } else if (key === 'remove_images') {
-                data.remove_images.forEach(imageId => {
-                    formData.append('remove_images[]', imageId);
-                });
-            } else {
-                formData.append(key, data[key]);
-            }
-        });
-
-        post(route('admin.products.update', product.id), {
-            data: formData,
-            onSuccess: () => {
-                // Reset new images and previews on success
-                setData('images', []);
-                setPreviews([]);
-            },
-            onError: (errors) => {
-                console.error('Update errors:', errors);
-                if (errors.error) {
-                    alert(errors.error);
-                } else {
-                    alert('Failed to update product. Please try again.');
-                }
-            }
-        });
+        post(route('admin.products.update', product.id));
     };
 
     const handleImageChange = (e) => {
@@ -85,8 +43,17 @@ export default function EditProduct({ product }) {
         setData('images', [...data.images, ...files]);
         
         // Generate previews for new images
-        const newPreviews = files.map(file => URL.createObjectURL(file));
-        setPreviews([...previews, ...newPreviews]);
+        const newPreviews = [];
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                newPreviews.push(reader.result);
+                if (newPreviews.length === files.length) {
+                    setPreviews([...previews, ...newPreviews]);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
     };
 
     const removeExistingImage = (imageId) => {

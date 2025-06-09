@@ -7,7 +7,7 @@ import { Link } from '@inertiajs/react'
 const Footer = () => {
 
   return (
-    <footer className='py-4 mt-8 w-full text-white bg-dark md:py-8'>
+    <footer className='absolute right-0 left-0 py-4 mt-8 w-full text-white bg-dark md:py-8'>
       <div className='section-container lg:mx-auto'>
         <div className='flex flex-col gap-14 w-full md:flex-row'>
           <div className='flex flex-col gap-2 md:w-1/2 md:gap-4 lg:w-1/3'>
