@@ -46,6 +46,35 @@ class ProductController extends Controller
         ]);
     }
 
+    private function copyToPublicHtml($path)
+    {
+        try {
+            // Path sumber file di storage
+            $sourcePath = storage_path('app/public/' . $path);
+            
+            // Path tujuan di public_html
+            $destinationPath = base_path('../public_html/storage/' . $path);
+            
+            // Pastikan direktori tujuan ada
+            $destinationDir = dirname($destinationPath);
+            if (!file_exists($destinationDir)) {
+                mkdir($destinationDir, 0755, true);
+            }
+            
+            // Copy file
+            if (file_exists($sourcePath)) {
+                copy($sourcePath, $destinationPath);
+                chmod($destinationPath, 0644);
+                return true;
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            \Log::error('Failed to copy file to public_html: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function store(Request $request)
     {
         try {
@@ -94,6 +123,9 @@ class ProductController extends Controller
                         ]);
 
                         $path = $imageFile->store('products', 'public');
+                        
+                        // Copy file ke public_html/storage
+                        $this->copyToPublicHtml($path);
                         
                         $product->images()->create([
                             'image_path' => $path,
@@ -148,67 +180,119 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price_per_day' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'category' => 'required|string',
-            'brand' => 'required|string',
-            'camera_type' => 'nullable|string',
-            'images' => 'nullable|array|max:3',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'remove_images' => 'nullable|array',
-            'remove_images.*' => 'integer|exists:images,id',
-        ]);
-
-        $product->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'price_per_day' => $validated['price_per_day'],
-            'stock' => $validated['stock'],
-            'category' => $validated['category'],
-            'brand' => $validated['brand'],
-            'camera_type' => $validated['camera_type'] ?? null,
-        ]);
-
-        if ($request->has('remove_images')) {
-            foreach ($request->remove_images as $imageId) {
-                $image = Image::find($imageId);
-                if ($image && $image->imageable_id == $product->id) {
-                    Storage::disk('public')->delete($image->image_path);
-                    $image->delete();
+        try {
+            // Add debug logging
+            \Log::info('Incoming product update request', [
+                'product_id' => $product->id,
+                'has_files' => $request->hasFile('images'),
+                'files_count' => $request->hasFile('images') ? count($request->file('images')) : 0
+            ]);
+    
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'price_per_day' => 'required|numeric|min:0',
+                'stock' => 'required|integer|min:0',
+                'category' => 'required|string',
+                'brand' => 'required|string',
+                'camera_type' => 'nullable|string',
+                'images' => 'nullable|array|max:3',
+                'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'remove_images' => 'nullable|array',
+                'remove_images.*' => 'integer|exists:images,id',
+            ]);
+    
+            $product->update([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'price_per_day' => $validated['price_per_day'],
+                'stock' => $validated['stock'],
+                'category' => $validated['category'],
+                'brand' => $validated['brand'],
+                'camera_type' => $validated['camera_type'] ?? null,
+            ]);
+    
+            // Handle image removal
+            if ($request->has('remove_images')) {
+                foreach ($request->remove_images as $imageId) {
+                    $image = Image::find($imageId);
+                    if ($image && $image->imageable_id == $product->id) {
+                        // Delete from storage
+                        Storage::disk('public')->delete($image->image_path);
+                        
+                        // Delete from public_html/storage
+                        $publicPath = base_path('../public_html/storage/' . $image->image_path);
+                        if (file_exists($publicPath)) {
+                            unlink($publicPath);
+                        }
+                        
+                        $image->delete();
+                    }
                 }
             }
-        }
-
-        // Add new images
-        if ($request->hasFile('images')) {
-            $currentImagesCount = $product->images()->count();
-            $newImagesCount = count($request->file('images'));
-            
-            if ($currentImagesCount + $newImagesCount <= 3) {
-                foreach ($request->file('images') as $imageFile) {
-                    $path = $imageFile->store('products', 'public');
-                    
-                    $product->images()->create([
-                        'image_path' => $path,
-                        'is_primary' => $product->images()->count() === 0, 
-                        'is_active' => false,
-                    ]);
+    
+            // Handle new images with error checking
+            if ($request->hasFile('images')) {
+                $currentImagesCount = $product->images()->count();
+                $newImagesCount = count($request->file('images'));
+                
+                if ($currentImagesCount + $newImagesCount <= 3) {
+                    foreach ($request->file('images') as $index => $imageFile) {
+                        try {
+                            if (!$imageFile->isValid()) {
+                                throw new \Exception('Invalid file upload: ' . $imageFile->getErrorMessage());
+                            }
+    
+                            // Log file information
+                            \Log::info('Processing image file for update', [
+                                'original_name' => $imageFile->getClientOriginalName(),
+                                'size' => $imageFile->getSize(),
+                                'mime' => $imageFile->getMimeType()
+                            ]);
+    
+                            $path = $imageFile->store('products', 'public');
+                            
+                            // Copy file ke public_html/storage
+                            $this->copyToPublicHtml($path);
+                            
+                            $product->images()->create([
+                                'image_path' => $path,
+                                'is_primary' => $product->images()->count() === 0,
+                                'is_active' => true,
+                            ]);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to process image during update: ' . $e->getMessage());
+                            throw $e;
+                        }
+                    }
+                } else {
+                    throw new \Exception('Maximum 3 images allowed per product');
                 }
             }
+    
+            return redirect()->route('admin.products.show', $product)
+                ->with('success', 'Product updated successfully.');
+                
+            } catch (\Exception $e) {
+                \Log::error('Product update failed: ' . $e->getMessage());
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['error' => 'Failed to update product: ' . $e->getMessage()]);
+            }
         }
-
-        return redirect()->route('admin.products.show', $product)
-            ->with('success', 'Product updated successfully.');
-    }
 
     public function destroy(Product $product)
     {
         // Delete associated images
         foreach ($product->images as $image) {
+            // Hapus file dari storage
             Storage::disk('public')->delete($image->image_path);
+            
+            // Hapus file dari public_html/storage
+            $publicPath = base_path('../public_html/storage/' . $image->image_path);
+            if (file_exists($publicPath)) {
+                unlink($publicPath);
+            }
         }
         
         $product->delete();

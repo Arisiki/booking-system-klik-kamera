@@ -53,7 +53,7 @@ export const icons =
     },
     {
       name: 'instagram-icon',
-      path: 'icons/Instagram.svg',
+      path: '/icons/Instagram.svg',
       link: '/'
     },
     {
