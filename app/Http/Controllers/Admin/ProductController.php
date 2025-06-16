@@ -39,10 +39,27 @@ class ProductController extends Controller
     {
         $categories = ['camera', 'lens', 'tripod', 'lighting', 'audio', 'accessory', 'bundle'];
         $brands = ['canon', 'nikon', 'sony', 'fujifilm', 'panasonic', 'gopro', 'dji', 'other'];
+        
+        // Get products with discount data for order creation
+        $products = Product::with('images')->get()->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price_per_day' => $product->price_per_day,
+                'discount_percentage' => $product->discount_percentage,
+                'discount_amount' => $product->discount_amount,
+                'discount_start_date' => $product->discount_start_date,
+                'discount_end_date' => $product->discount_end_date,
+                'is_on_sale' => $product->is_on_sale,
+                'has_active_discount' => $product->hasActiveDiscount(),
+                'discounted_price' => $product->getDiscountedPrice(),
+            ];
+        });
 
         return Inertia::render('Admin/Products/Create', [
             'categories' => $categories,
             'brands' => $brands,
+            'products' => $products, // Add this for order creation
         ]);
     }
 
@@ -94,9 +111,20 @@ class ProductController extends Controller
                 'camera_type' => 'nullable|string',
                 'images' => 'required|array|min:1|max:3',
                 'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'is_on_sale' => 'boolean',
+                'discount_type' => 'required_if:is_on_sale,true|in:percentage,fixed',
+                'discount_percentage' => 'required_if:discount_type,percentage|nullable|numeric|min:0|max:100',
+                'discount_amount' => 'required_if:discount_type,fixed|nullable|numeric|min:0',
+                'discount_start_date' => 'nullable|date|after_or_equal:today',
+                'discount_end_date' => 'nullable|date|after:discount_start_date',
             ]);
 
             // Create the product
+            // Tentukan apakah produk sedang diskon
+            $isOnSale = ($validated['discount_percentage'] > 0 || $validated['discount_amount'] > 0) 
+                        && !empty($validated['discount_start_date']) 
+                        && !empty($validated['discount_end_date']);
+            
             $product = Product::create([
                 'name' => $validated['name'],
                 'description' => $validated['description'],
@@ -105,6 +133,12 @@ class ProductController extends Controller
                 'category' => $validated['category'],
                 'brand' => $validated['brand'],
                 'camera_type' => $validated['camera_type'] ?? null,
+                'is_on_sale' => $isOnSale,
+                'discount_type' => $validated['discount_type'] ?? 'percentage',
+                'discount_percentage' => $validated['discount_percentage'] ?? 0,
+                'discount_amount' => $validated['discount_amount'] ?? 0,
+                'discount_start_date' => $validated['discount_start_date'] ?? null,
+                'discount_end_date' => $validated['discount_end_date'] ?? null,
             ]);
 
             // Handle multiple images with error checking
@@ -200,8 +234,19 @@ class ProductController extends Controller
                 'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'remove_images' => 'nullable|array',
                 'remove_images.*' => 'integer|exists:images,id',
+                'is_on_sale' => 'boolean',
+                'discount_type' => 'required_if:is_on_sale,true|in:percentage,fixed',
+                'discount_percentage' => 'required_if:discount_type,percentage|nullable|numeric|min:0|max:100',
+                'discount_amount' => 'required_if:discount_type,fixed|nullable|numeric|min:0',
+                'discount_start_date' => 'nullable|date',
+                'discount_end_date' => 'nullable|date|after:discount_start_date',
             ]);
     
+            // Tentukan apakah produk sedang diskon
+            $isOnSale = ($validated['discount_percentage'] > 0 || $validated['discount_amount'] > 0) 
+                        && !empty($validated['discount_start_date']) 
+                        && !empty($validated['discount_end_date']);
+            
             $product->update([
                 'name' => $validated['name'],
                 'description' => $validated['description'],
@@ -210,6 +255,12 @@ class ProductController extends Controller
                 'category' => $validated['category'],
                 'brand' => $validated['brand'],
                 'camera_type' => $validated['camera_type'] ?? null,
+                'is_on_sale' => $isOnSale,
+                'discount_type' => $validated['discount_type'] ?? 'percentage',
+                'discount_percentage' => $validated['discount_percentage'] ?? 0,
+                'discount_amount' => $validated['discount_amount'] ?? 0,
+                'discount_start_date' => $validated['discount_start_date'] ?? null,
+                'discount_end_date' => $validated['discount_end_date'] ?? null,
             ]);
     
             // Handle image removal

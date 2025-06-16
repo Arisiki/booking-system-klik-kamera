@@ -3,12 +3,32 @@ import { formatRupiah } from '@/utils'
 import { Link } from '@inertiajs/react'
 import React from 'react'
 
-const CardProduct = ({productName, productPrice, productId, productImage, bookNow, addToCart}) => {
+const CardProduct = ({productName, productPrice, productId, productImage, bookNow, addToCart, product}) => {
 
   const formattedPrice = new Intl.NumberFormat('id-ID', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(productPrice)
+
+  // Fungsi untuk mengecek apakah produk sedang diskon
+  const hasActiveDiscount = () => {
+    if (!product?.discount_percentage || !product?.discount_start_date || !product?.discount_end_date) {
+      return false;
+    }
+    
+    const now = new Date();
+    const startDate = new Date(product.discount_start_date);
+    const endDate = new Date(product.discount_end_date);
+    
+    return now >= startDate && now <= endDate;
+  };
+
+  // Fungsi untuk menghitung harga setelah diskon
+  const getDiscountedPrice = () => {
+    if (!hasActiveDiscount()) return productPrice;
+    return productPrice - (productPrice * product.discount_percentage / 100);
+  };
+
   return (
     <div
       className='md:w-[20dvw] bg-white border rounded-[18px] px-2 pt-10 pb-5 flex flex-col items-center gap-2 laptop:w-[16dvw] lg:w-[250px] h-fit laptop:px-3 lg:px-5 relative'
@@ -20,13 +40,40 @@ const CardProduct = ({productName, productPrice, productId, productImage, bookNo
         <h2 className='hidden text-xs text-white laptop:block'>Pilihan Terbaik</h2>
       </div>
 
+      {/* Discount Badge */}
+      {hasActiveDiscount() && (
+        <div className='absolute top-0 right-4 bg-red-500 text-white px-2 py-1 rounded-b-lg text-xs font-bold'>
+          -{product.discount_percentage}%
+        </div>
+      )}
+
       <img src={`/storage/${productImage.find(img => img.is_primary).image_path}`} alt="" className='lg:h-[133px]' loading='lazy'/>
       </Link>
 
       <div className='flex flex-col gap-4 mt-2 min-w-full'>
         <div className='flex flex-col gap-2'>
           <h2 className='text-lg font-bold leading-none text-primary lg:text-xl'>{productName}</h2>
-          <h3 className='text-sm font-bold leading-none text-secondary lg:text-base'>{formatRupiah(productPrice)} /Hari</h3>
+          
+          {/* Price Display with Discount */}
+          <div className='flex flex-col gap-1'>
+            {hasActiveDiscount() ? (
+              <>
+                <div className='flex items-center gap-2'>
+                  <h3 className='text-sm font-bold leading-none text-secondary lg:text-base'>
+                    {formatRupiah(getDiscountedPrice())} /Hari
+                  </h3>
+                </div>
+                <div className='text-xs text-gray-500 line-through'>
+                  {formatRupiah(productPrice)} /Hari
+                </div>
+              </>
+            ) : (
+              <h3 className='text-sm font-bold leading-none text-secondary lg:text-base'>
+                {formatRupiah(productPrice)} /Hari
+              </h3>
+            )}
+          </div>
+          
           <hr />
         </div>
 

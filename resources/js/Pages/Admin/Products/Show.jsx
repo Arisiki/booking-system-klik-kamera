@@ -116,9 +116,27 @@ export default function ProductShow({ product, categories, brands }) {
                                             <p className="text-sm text-gray-500">Tipe Kamera</p>
                                             <p className="font-medium">{product.camera_type || '-'}</p>
                                         </div>
-                                        <div>
-                                            <p className="text-sm text-gray-500">Harga per Hari</p>
-                                            <p className="font-medium text-green-600">{formatRupiah(product.price_per_day)}</p>
+                                        <div className="bg-white overflow-hidden shadow rounded-lg">
+                                            <div className="px-4 py-5 sm:p-6">
+                                                <dt className="text-sm font-medium text-gray-500 truncate">Harga per Hari</dt>
+                                                <dd className="mt-1 text-3xl font-semibold text-gray-900">
+                                                    {product.has_active_discount ? (
+                                                        <div className="flex flex-col">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-green-600">{formatRupiah(product.discounted_price)}</span>
+                                                                <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
+                                                                    -{product.discount_percentage}% OFF
+                                                                </span>
+                                                            </div>
+                                                            <span className="text-sm text-gray-500 line-through">
+                                                                {formatRupiah(product.price_per_day)}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-green-600">{formatRupiah(product.price_per_day)}</span>
+                                                    )}
+                                                </dd>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

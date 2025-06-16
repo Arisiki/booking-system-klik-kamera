@@ -11,10 +11,11 @@ class CartHelper
     {
         $product = Product::findOrFail($productId);
         
-        // Hitung rental cost
+        // Hitung rental cost dengan mempertimbangkan diskon
         $days = Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate)) + 1;
-        $rentalCost = $product->price_per_day * $quantity * $days;
-
+        $pricePerDay = $product->hasActiveDiscount() ? $product->getDiscountedPrice() : $product->price_per_day;
+        $rentalCost = $pricePerDay * $quantity * $days;
+    
         $cartItem = [
             'product_id' => $productId,
             'product' => $product,
@@ -28,7 +29,7 @@ class CartHelper
             'phone_number' => $phoneNumber,
             'rental_cost' => $rentalCost
         ];
-
+    
         session()->put("cart.{$productId}", $cartItem);
     }
 

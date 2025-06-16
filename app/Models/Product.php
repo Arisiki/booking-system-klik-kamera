@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Product extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductsFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -17,13 +17,24 @@ class Product extends Model
         'brand',
         'description',
         'price_per_day',
+        'discount_percentage',
+        'discount_amount',
+        'discount_type',
+        'is_on_sale',
+        'discount_start_date',
+        'discount_end_date',
         'stock',
         'image_path'
     ];
 
     protected $casts = [
         'price_per_day' => 'decimal:2',
+        'discount_percentage' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'stock' => 'integer',
+        'is_on_sale' => 'boolean',
+        'discount_start_date' => 'datetime',
+        'discount_end_date' => 'datetime',
     ];
 
     //relations
@@ -142,5 +153,71 @@ class Product extends Model
         }
         
         return $unavailableDates;
+    }
+
+    /**
+     * Check if product has active discount
+     */
+    public function hasActiveDiscount(): bool
+    {
+        if (!$this->is_on_sale) {
+            return false;
+        }
+
+        $now = Carbon::now();
+        
+        if ($this->discount_start_date && $now->lt($this->discount_start_date)) {
+            return false;
+        }
+        
+        if ($this->discount_end_date && $now->gt($this->discount_end_date)) {
+            return false;
+        }
+
+        return ($this->discount_percentage > 0 || $this->discount_amount > 0);
+    }
+
+    /**
+     * Get discounted price
+     */
+    public function getDiscountedPrice(): float
+    {
+        if (!$this->hasActiveDiscount()) {
+            return $this->price_per_day;
+        }
+
+        if ($this->discount_type === 'percentage') {
+            return $this->price_per_day - ($this->price_per_day * $this->discount_percentage / 100);
+        }
+        
+        return max(0, $this->price_per_day - $this->discount_amount);
+    }
+
+    /**
+     * Get discount amount in rupiah
+     */
+    public function getDiscountAmountRupiah(): float
+    {
+        if (!$this->hasActiveDiscount()) {
+            return 0;
+        }
+
+        return $this->price_per_day - $this->getDiscountedPrice();
+    }
+
+    /**
+     * Get discount percentage (calculated for fixed amount discounts)
+     */
+    public function getDiscountPercentageCalculated(): float
+    {
+        if (!$this->hasActiveDiscount()) {
+            return 0;
+        }
+
+        if ($this->discount_type === 'percentage') {
+            return $this->discount_percentage;
+        }
+
+        return ($this->getDiscountAmountRupiah() / $this->price_per_day) * 100;
     }
 }

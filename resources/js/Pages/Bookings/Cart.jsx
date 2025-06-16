@@ -30,14 +30,18 @@ export default function Cart() {
                     <section className='flex flex-col gap-3 laptop:w-3/4'>
                         <h1 className='text-lg font-bold text-primary md:text-2xl'>Product</h1>
                         <div className='flex flex-col gap-4'>
-                            {cartItems.map((item, i) => (
-                                <CartCardProduct 
-                                    key={i}
+                            {cartItems.map((item, index) => (
+                                <CartCardProduct
+                                    key={index}
+                                    image={item.product.images?.[0]?.image_path}
                                     productName={item.product.name}
                                     productQuantity={item.quantity}
                                     startDate={item.start_date}
                                     endDate={item.end_date}
-                                    dayPrice={item.product.price_per_day}
+                                    dayPrice={item.product.has_active_discount ? item.product.discounted_price : item.product.price_per_day}
+                                    originalPrice={item.product.price_per_day}
+                                    hasDiscount={item.product.has_active_discount}
+                                    discountPercentage={item.product.discount_percentage}
                                     totalPrice={item.rental_cost}
                                 />
                             ))}

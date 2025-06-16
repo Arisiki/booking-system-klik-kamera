@@ -99,10 +99,24 @@ export default function ProductsIndex({ products, filters }) {
                                                 {product.category}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-500">
-                                                {formatRupiah(product.price_per_day)}
-                                            </div>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {product.has_active_discount ? (
+                                                <div className="flex flex-col">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-medium text-green-600">
+                                                            {formatRupiah(product.discounted_price)}
+                                                        </span>
+                                                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
+                                                            -{product.discount_percentage}%
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs text-gray-500 line-through">
+                                                        {formatRupiah(product.price_per_day)}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                formatRupiah(product.price_per_day)
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm text-gray-500">
