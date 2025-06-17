@@ -106,22 +106,24 @@ class BookingController extends Controller
             'email' => 'required|email',
             'phoneNumber' => 'required|numeric'
         ]);
-
+    
         // Cek ketersediaan
         if (!$product->isAvailableForDates($request->start_date, $request->end_date)) {
-            // Ubah ini untuk menambahkan key spesifik
             return back()->withErrors(['quantity' => 'Product is not available for the selected dates.']);
         }
     
         if ($request->quantity > $product->stock) {
-            // Ubah ini untuk menambahkan key spesifik
             return back()->withErrors(['quantity' => 'Requested quantity exceeds available stock.']);
         }
-
-        // Hitung biaya
-        $days = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date)) + 1;
-        $rentalCost = $product->price_per_day * $request->quantity * $days;
-
+    
+        // Ganti logika perhitungan biaya
+        $rentalCalculation = $product->calculateRentalCost(
+            $request->start_date, 
+            $request->end_date, 
+            $request->quantity
+        );
+        $rentalCost = $rentalCalculation['total_cost'];
+    
         // Buat order
         $order = Order::create([
             'user_id' => auth()->id(),
@@ -136,7 +138,7 @@ class BookingController extends Controller
             'email' => $request->email,
             'phone_number' => $request->phoneNumber
         ]);
-
+    
         // Buat order item
         OrderItems::create([
             'order_id' => $order->id,
@@ -146,9 +148,9 @@ class BookingController extends Controller
             'address' => $request->pickupAddress,
             'pickup_method' => $request->pickup_method
         ]);
-
+    
         CancelOrderJob::dispatch($order->id)->delay(now()->addHour(3));
-
+    
         return redirect()->route('checkout.show', $order->id)->with('success', 'Order created successfully!');
     }
 
@@ -482,7 +484,8 @@ class BookingController extends Controller
         // Hitung biaya tambahan
         $additionalCost = 0;
         foreach ($order->orderItems as $item) {
-            $additionalCost += $item->product->price_per_day * $item->quantity * $additionalDays;
+            $pricePerDay = $item->product->hasActiveDiscount() ? $item->product->getDiscountedPrice() : $item->product->price_per_day;
+            $additionalCost += $pricePerDay * $item->quantity * $additionalDays;
         }
 
         $order->update([

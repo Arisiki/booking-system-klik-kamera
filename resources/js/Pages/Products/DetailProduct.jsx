@@ -21,6 +21,34 @@ export default function DetailProduct() {
     const [showBookingForm, setShowBookingForm] = useState(false);
     const [isAddToCart, setIsAddToCart] = useState(false);
 
+    // Fungsi untuk mengecek apakah produk sedang diskon
+    const hasActiveDiscount = () => {
+        if (!product?.discount_percentage || !product?.discount_start_date || !product?.discount_end_date) {
+            return false;
+        }
+        
+        const now = new Date();
+        const startDate = new Date(product.discount_start_date);
+        const endDate = new Date(product.discount_end_date);
+        
+        // Set waktu ke akhir hari untuk endDate (23:59:59)
+        endDate.setHours(23, 59, 59, 999);
+        
+        return now >= startDate && now <= endDate;
+    };
+
+    // Fungsi untuk menghitung harga setelah diskon
+    const getDiscountedPrice = () => {
+        if (!hasActiveDiscount()) return product.price_per_day;
+        return product.price_per_day - (product.price_per_day * product.discount_percentage / 100);
+    };
+
+    // Fungsi untuk menghitung penghematan
+    const getSavings = () => {
+        if (!hasActiveDiscount()) return 0;
+        return product.price_per_day - getDiscountedPrice();
+    };
+
     const handleBooking = (addToCart = false) => {
         if(!user) return router.visit(route('login'));
         setIsAddToCart(addToCart);
@@ -57,7 +85,15 @@ export default function DetailProduct() {
 
                 <div className='flex flex-col gap-6 laptop:flex-row laptop:justify-between' >
                     <section className='w-full flex flex-col gap-2 md:flex-row md:gap-4 laptop:w-1/2 laptop:justify-bertween items-center laptop:items-start'>
-                        <img src={`/storage/${activeImage}`} alt="" className='rounded-xl md:order-2 w-[361px] object-cover md:w-[531px] laptop:w-4/5 h-fit' />
+                        {/* Discount Badge pada gambar */}
+                        <div className='relative'>
+                            <img src={`/storage/${activeImage}`} alt="" className='rounded-xl md:order-2 w-[361px] object-cover md:w-[531px] laptop:w-4/5 h-fit' />
+                            {hasActiveDiscount() && (
+                                <div className='absolute top-4 right-4 bg-red-500 text-white px-3 py-2 rounded-lg font-bold text-lg shadow-lg'>
+                                    -{product.discount_percentage}% OFF
+                                </div>
+                            )}
+                        </div>
                         <div className='flex flex-row md:flex-col gap-4 justify-around w-full md:justify-start md:w-fit'>
                             {productImages.map((img) => (
                                 <button
@@ -77,9 +113,32 @@ export default function DetailProduct() {
                             <h1 className='text-primary font-bold text-[40px] md:text-5xl'>
                                 {product.name}
                             </h1>
-                            <span className='text-secondary font-bold text-2xl md:text-3xl'>
-                                {formatRupiah(product.price_per_day)}/Day
-                            </span>
+                            
+                            {/* Price Display with Discount */}
+                            <div className='flex flex-col gap-2'>
+                                {hasActiveDiscount() ? (
+                                    <>
+                                        <div className='flex items-center gap-3'>
+                                            <span className='text-secondary font-bold text-2xl md:text-3xl'>
+                                                {formatRupiah(getDiscountedPrice())}/Day
+                                            </span>
+                                            <span className='bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold'>
+                                                -{product.discount_percentage}% OFF
+                                            </span>
+                                        </div>
+                                        <div className='text-lg text-gray-500 line-through'>
+                                            {formatRupiah(product.price_per_day)}/Day
+                                        </div>
+                                        <div className='text-sm text-green-600 font-medium'>
+                                            Hemat {formatRupiah(getSavings())} per hari!
+                                        </div>
+                                    </>
+                                ) : (
+                                    <span className='text-secondary font-bold text-2xl md:text-3xl'>
+                                        {formatRupiah(product.price_per_day)}/Day
+                                    </span>
+                                )}
+                            </div>
                         </div>
                         
                         <div className='grid grid-cols-2 gap-2 md:grid-cols-3'>
@@ -122,13 +181,36 @@ export default function DetailProduct() {
                                     {product.description}
                                 </p>
                             </div>
+                            
+                            {/* Discount Information */}
+                            {hasActiveDiscount() && (
+                                <div className='bg-gradient-to-r from-red-50 to-orange-50 p-4 rounded-lg border border-red-200'>
+                                    <div className='flex items-center gap-2 mb-2'>
+                                        <MdDiscount className='text-red-500 text-xl'/>
+                                        <h3 className='text-red-700 font-bold'>Promo Spesial!</h3>
+                                    </div>
+                                    <p className='text-sm text-red-600 mb-2'>
+                                        Dapatkan diskon {product.discount_percentage}% untuk produk ini!
+                                    </p>
+                                    <div className='text-xs text-red-500'>
+                                        Berlaku hingga: {new Date(product.discount_end_date).toLocaleDateString('id-ID', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                            
                             {/* Buttons */}
                             <div className='flex flex-col font-bold gap-4 md:flex-row'>
                                 <button
                                     className='w-full text-center py-4 bg-primary text-white font-bold rounded-md'
                                     onClick={() => handleBooking(false)}
                                 >
-                                    Book Now
+                                    {hasActiveDiscount() ? `Book Now - ${formatRupiah(getDiscountedPrice())}/Day` : 'Book Now'}
                                 </button>
                                 <button
                                     className='w-full text-center py-4 text-primary border border-primary font-bold rounded-md'
@@ -211,70 +293,6 @@ export default function DetailProduct() {
                     <p className='text-thrid/70'>Masih belum ada review untuk produk ini.</p>
                 )}
                 </section>
-                
-
-
-
-
-
-
-
-
-
-                {/* <h1 className="text-2xl font-bold mb-4">{product.name}</h1>
-                <p>Category: {product.category.charAt(0).toUpperCase() + product.category.slice(1).replace('_', ' ')}</p>
-                {product.camera_type && (
-                    <p>Jenis Kamera: {product.camera_type.charAt(0).toUpperCase() + product.camera_type.slice(1).replace('_', ' ')}</p>
-                )}
-                <p>Merek: {product.brand.charAt(0).toUpperCase() + product.brand.slice(1)}</p>
-                <p>Description: {product.description}</p>
-                <p>Price per Day: Rp {product.price_per_day}</p>
-                <p>Stock: {product.stock}</p>
-                <div className="mb-4">
-                    <h3 className="text-lg font-bold">Images:</h3>
-                    {product.images.map(image => (
-                        <img key={image.id} src={image.image_path} alt="Product Image" className="w-1/2 h-auto rounded mb-2" />
-                    ))}
-                </div>
-                <div className="flex gap-4 mb-4">
-                    <button
-                        onClick={() => handleBooking(true)}
-                        className="bg-green-500 text-white px-4 py-2 rounded"
-                    >
-                        Add to Cart
-                    </button>
-                    <button
-                        onClick={() => handleBooking(false)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded"
-                    >
-                        Book Now
-                    </button>
-                </div> */}
-
-                {/* Bagian Ulasan */}
-                {/* <div className="mt-8">
-                    <h2 className="text-xl font-bold mb-4">Product Reviews</h2>
-                    {product.reviews && product.reviews.length > 0 ? (
-                        <div>
-                            {product.reviews.map((review) => (
-                                <div key={review.id} className="mb-4 p-4 border rounded">
-                                    <p className="font-bold">{review.user.name}</p>
-                                    <p>Rating: {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</p>
-                                    <p>Comment: {review.comment || 'No comment'}</p>
-                                    <p className="text-sm text-gray-500">
-                                        Reviewed on {new Date(review.created_at).toLocaleDateString('id-ID', {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric',
-                                        })}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p>No reviews yet.</p>
-                    )}
-                </div> */}
             </article>
             
             <Footer />

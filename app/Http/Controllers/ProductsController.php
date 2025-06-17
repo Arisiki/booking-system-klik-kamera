@@ -22,13 +22,29 @@ class ProductsController extends Controller
             ->when($request->search, fn($query, $search) => $query->where('name', 'like', "%{$search}%"))
             ->with('images')
             ->orderBy('name')
-            ->get();
-
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'price_per_day' => $product->price_per_day,
+                    'stock' => $product->stock,
+                    'category' => $product->category,
+                    'brand' => $product->brand,
+                    'camera_type' => $product->camera_type,
+                    'images' => $product->images,
+                    'discount_percentage' => $product->discount_percentage,
+                    'discount_start_date' => $product->discount_start_date,
+                    'discount_end_date' => $product->discount_end_date,
+                    'has_active_discount' => $product->hasActiveDiscount(),
+                    'discounted_price' => $product->getDiscountedPrice(),
+                ];
+            });
 
         $categories = Product::select('category')->distinct()->pluck('category');
         $cameraTypes = Product::whereNotNull('camera_type')->select('camera_type')->distinct()->pluck('camera_type');
         $brands = Product::select('brand')->distinct()->pluck('brand');
-
 
         return Inertia::render('Products/AllProducts', [
             'products' => $products,
@@ -52,10 +68,33 @@ class ProductsController extends Controller
             ->where('id', '!=', $product->id)
             ->with('images')
             ->take(3)
-            ->get();
+            ->get()
+            ->map(function ($relatedProduct) {
+                return [
+                    'id' => $relatedProduct->id,
+                    'name' => $relatedProduct->name,
+                    'description' => $relatedProduct->description,
+                    'price_per_day' => $relatedProduct->price_per_day,
+                    'stock' => $relatedProduct->stock,
+                    'category' => $relatedProduct->category,
+                    'brand' => $relatedProduct->brand,
+                    'camera_type' => $relatedProduct->camera_type,
+                    'images' => $relatedProduct->images,
+                    'discount_percentage' => $relatedProduct->discount_percentage,
+                    'discount_start_date' => $relatedProduct->discount_start_date,
+                    'discount_end_date' => $relatedProduct->discount_end_date,
+                    'has_active_discount' => $relatedProduct->hasActiveDiscount(),
+                    'discounted_price' => $relatedProduct->getDiscountedPrice(),
+                ];
+            });
+        
+        // Tambahkan data diskon untuk produk utama
+        $productData = $product->toArray();
+        $productData['has_active_discount'] = $product->hasActiveDiscount();
+        $productData['discounted_price'] = $product->getDiscountedPrice();
         
         return Inertia::render('Products/DetailProduct', [
-            'product' => $product,
+            'product' => $productData,
             'relatedProducts' => $relatedProducts
         ]);
     }
@@ -67,7 +106,26 @@ class ProductsController extends Controller
             ->when($request->camera_type, fn($query, $cameraTypes) => $query->where('camera_type', $cameraTypes))
             ->when($request->brand, fn($query, $brand) => $query->where('brand', $brand))
             ->with('images')
-            ->get();
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'price_per_day' => $product->price_per_day,
+                    'stock' => $product->stock,
+                    'category' => $product->category,
+                    'brand' => $product->brand,
+                    'camera_type' => $product->camera_type,
+                    'images' => $product->images,
+                    // Tambahan data diskon
+                    'discount_percentage' => $product->discount_percentage,
+                    'discount_start_date' => $product->discount_start_date,
+                    'discount_end_date' => $product->discount_end_date,
+                    'has_active_discount' => $product->hasActiveDiscount(),
+                    'discounted_price' => $product->getDiscountedPrice(),
+                ];
+            });
 
         $cameraTypes = Product::whereNotNull('camera_type')->select('camera_type')->distinct()->pluck('camera_type');
         $brand = Product::select('brand')->distinct()->pluck('brand');
@@ -86,7 +144,26 @@ class ProductsController extends Controller
             ->where('category', '!=', 'bundle')
             ->when($request->brand, fn($query, $brand) => $query->where('brand', $brand))
             ->with('images')
-            ->get();
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'price_per_day' => $product->price_per_day,
+                    'stock' => $product->stock,
+                    'category' => $product->category,
+                    'brand' => $product->brand,
+                    'camera_type' => $product->camera_type,
+                    'images' => $product->images,
+                    // Tambahan data diskon
+                    'discount_percentage' => $product->discount_percentage,
+                    'discount_start_date' => $product->discount_start_date,
+                    'discount_end_date' => $product->discount_end_date,
+                    'has_active_discount' => $product->hasActiveDiscount(),
+                    'discounted_price' => $product->getDiscountedPrice(),
+                ];
+            });
 
         $brand = Product::select('brand')->distinct()->pluck('brand');
 
@@ -101,8 +178,26 @@ class ProductsController extends Controller
             ->where('category', 'camera')
             ->where('camera_type', 'mirrorless')
             ->with('images')
-            ->get();
-
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'price_per_day' => $product->price_per_day,
+                    'stock' => $product->stock,
+                    'category' => $product->category,
+                    'brand' => $product->brand,
+                    'camera_type' => $product->camera_type,
+                    'images' => $product->images,
+                    // Tambahan data diskon
+                    'discount_percentage' => $product->discount_percentage,
+                    'discount_start_date' => $product->discount_start_date,
+                    'discount_end_date' => $product->discount_end_date,
+                    'has_active_discount' => $product->hasActiveDiscount(),
+                    'discounted_price' => $product->getDiscountedPrice(),
+                ];
+            });
 
         return Inertia::render('Home', [
             'products' => $products
