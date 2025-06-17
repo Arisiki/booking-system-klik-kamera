@@ -220,4 +220,58 @@ class Product extends Model
 
         return ($this->getDiscountAmountRupiah() / $this->price_per_day) * 100;
     }
+
+    /**
+     * Check if discount is active for a specific date
+     */
+    public function hasActiveDiscountForDate($date): bool
+    {
+        if (!$this->is_on_sale) {
+            return false;
+        }
+    
+        $checkDate = Carbon::parse($date);
+        
+        if ($this->discount_start_date && $checkDate->lt(Carbon::parse($this->discount_start_date))) {
+            return false;
+        }
+        
+        if ($this->discount_end_date && $checkDate->gt(Carbon::parse($this->discount_end_date))) {
+            return false;
+        }
+    
+        return ($this->discount_percentage > 0 || $this->discount_amount > 0);
+    }
+
+    /**
+     * Calculate rental cost with proper discount logic per day
+     */
+    public function calculateRentalCost($startDate, $endDate, $quantity = 1): array
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        $totalCost = 0;
+        $breakdown = [];
+        
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+            $pricePerDay = $this->hasActiveDiscountForDate($date) 
+                ? $this->getDiscountedPrice() 
+                : $this->price_per_day;
+                
+            $dailyCost = $pricePerDay * $quantity;
+            $totalCost += $dailyCost;
+            
+            $breakdown[] = [
+                'date' => $date->format('Y-m-d'),
+                'price_per_day' => $pricePerDay,
+                'has_discount' => $this->hasActiveDiscountForDate($date),
+                'daily_cost' => $dailyCost
+            ];
+        }
+        
+        return [
+            'total_cost' => $totalCost,
+            'breakdown' => $breakdown
+        ];
+    }
 }

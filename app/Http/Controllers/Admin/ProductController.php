@@ -16,7 +16,7 @@ class ProductController extends Controller
     {
         $query = Product::query()
             ->with('images');
-
+    
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -26,9 +26,16 @@ class ProductController extends Controller
                   ->orWhere('brand', 'like', "%{$search}%");
             });
         }
-
+    
         $products = $query->latest()->paginate(10);
-
+    
+        // Transform products to include discount data
+        $products->getCollection()->transform(function ($product) {
+            $product->has_active_discount = $product->hasActiveDiscount();
+            $product->discounted_price = $product->getDiscountedPrice();
+            return $product;
+        });
+    
         return Inertia::render('Admin/Products/Index', [
             'products' => $products,
             'filters' => $request->only('search'),

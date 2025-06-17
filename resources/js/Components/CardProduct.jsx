@@ -20,6 +20,9 @@ const CardProduct = ({productName, productPrice, productId, productImage, bookNo
     const startDate = new Date(product.discount_start_date);
     const endDate = new Date(product.discount_end_date);
     
+    // Set waktu ke akhir hari untuk endDate (23:59:59)
+    endDate.setHours(23, 59, 59, 999);
+    
     return now >= startDate && now <= endDate;
   };
 
@@ -42,7 +45,7 @@ const CardProduct = ({productName, productPrice, productId, productImage, bookNo
 
       {/* Discount Badge */}
       {hasActiveDiscount() && (
-        <div className='absolute top-0 right-4 bg-red-500 text-white px-2 py-1 rounded-b-lg text-xs font-bold'>
+        <div className='absolute top-0 right-4 px-2 py-1 text-xs font-bold text-white bg-red-500 rounded-b-lg'>
           -{product.discount_percentage}%
         </div>
       )}
@@ -58,7 +61,7 @@ const CardProduct = ({productName, productPrice, productId, productImage, bookNo
           <div className='flex flex-col gap-1'>
             {hasActiveDiscount() ? (
               <>
-                <div className='flex items-center gap-2'>
+                <div className='flex gap-2 items-center'>
                   <h3 className='text-sm font-bold leading-none text-secondary lg:text-base'>
                     {formatRupiah(getDiscountedPrice())} /Hari
                   </h3>

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { FiEdit, FiTrash2, FiPlus, FiSearch } from 'react-icons/fi';
+import { FiEdit, FiTrash2, FiPlus, FiSearch, FiEye } from 'react-icons/fi';
 import { formatRupiah } from '@/utils';
 
 export default function ProductsIndex({ products, filters }) {
@@ -99,14 +99,14 @@ export default function ProductsIndex({ products, filters }) {
                                                 {product.category}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
                                             {product.has_active_discount ? (
                                                 <div className="flex flex-col">
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex gap-2 items-center">
                                                         <span className="font-medium text-green-600">
                                                             {formatRupiah(product.discounted_price)}
                                                         </span>
-                                                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
+                                                        <span className="px-2 py-1 text-xs text-red-600 bg-red-100 rounded-full">
                                                             -{product.discount_percentage}%
                                                         </span>
                                                     </div>
@@ -126,14 +126,23 @@ export default function ProductsIndex({ products, filters }) {
                                         <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
                                             <div className="flex space-x-2">
                                                 <Link
+                                                    href={route('admin.products.show', product.id)}
+                                                    className="text-green-600 hover:text-green-900"
+                                                    title="Lihat Detail"
+                                                >
+                                                    <FiEye className="w-5 h-5" />
+                                                </Link>
+                                                <Link
                                                     href={route('admin.products.edit', product.id)}
                                                     className="text-indigo-600 hover:text-indigo-900"
+                                                    title="Edit Produk"
                                                 >
                                                     <FiEdit className="w-5 h-5" />
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(product.id)}
                                                     className="text-red-600 hover:text-red-900"
+                                                    title="Hapus Produk"
                                                 >
                                                     <FiTrash2 className="w-5 h-5" />
                                                 </button>

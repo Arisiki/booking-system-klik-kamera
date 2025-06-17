@@ -11,10 +11,9 @@ class CartHelper
     {
         $product = Product::findOrFail($productId);
         
-        // Hitung rental cost dengan mempertimbangkan diskon
-        $days = Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate)) + 1;
-        $pricePerDay = $product->hasActiveDiscount() ? $product->getDiscountedPrice() : $product->price_per_day;
-        $rentalCost = $pricePerDay * $quantity * $days;
+        // Hitung rental cost dengan logika diskon per hari yang benar
+        $rentalCalculation = $product->calculateRentalCost($startDate, $endDate, $quantity);
+        $rentalCost = $rentalCalculation['total_cost'];
     
         $cartItem = [
             'product_id' => $productId,
@@ -27,7 +26,8 @@ class CartHelper
             'user_name' => $userName,
             'email' => $email,
             'phone_number' => $phoneNumber,
-            'rental_cost' => $rentalCost
+            'rental_cost' => $rentalCost,
+            'price_breakdown' => $rentalCalculation['breakdown'] // Opsional: untuk transparansi
         ];
     
         session()->put("cart.{$productId}", $cartItem);
@@ -62,5 +62,19 @@ class CartHelper
     public static function clearCart()
     {
         // session()->forget('cart');
+    }
+
+    public static function calculateItemTotal($item)
+    {
+        $product = Product::find($item['product_id']);
+        if (!$product) return 0;
+        
+        $rentalCalculation = $product->calculateRentalCost(
+            $item['start_date'],
+            $item['end_date'],
+            $item['quantity']
+        );
+        
+        return $rentalCalculation['total_cost'];
     }
 }

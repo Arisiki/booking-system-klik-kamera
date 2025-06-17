@@ -31,6 +31,9 @@ export default function DetailProduct() {
         const startDate = new Date(product.discount_start_date);
         const endDate = new Date(product.discount_end_date);
         
+        // Set waktu ke akhir hari untuk endDate (23:59:59)
+        endDate.setHours(23, 59, 59, 999);
+        
         return now >= startDate && now <= endDate;
     };
 

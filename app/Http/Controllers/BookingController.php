@@ -116,10 +116,13 @@ class BookingController extends Controller
             return back()->withErrors(['quantity' => 'Requested quantity exceeds available stock.']);
         }
     
-        // Hitung biaya dengan mempertimbangkan diskon
-        $days = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($request->end_date)) + 1;
-        $pricePerDay = $product->hasActiveDiscount() ? $product->getDiscountedPrice() : $product->price_per_day;
-        $rentalCost = $pricePerDay * $request->quantity * $days;
+        // Ganti logika perhitungan biaya
+        $rentalCalculation = $product->calculateRentalCost(
+            $request->start_date, 
+            $request->end_date, 
+            $request->quantity
+        );
+        $rentalCost = $rentalCalculation['total_cost'];
     
         // Buat order
         $order = Order::create([

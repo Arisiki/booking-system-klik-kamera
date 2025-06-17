@@ -34,7 +34,6 @@ class ProductsController extends Controller
                     'brand' => $product->brand,
                     'camera_type' => $product->camera_type,
                     'images' => $product->images,
-                    // Tambahan data diskon
                     'discount_percentage' => $product->discount_percentage,
                     'discount_start_date' => $product->discount_start_date,
                     'discount_end_date' => $product->discount_end_date,
@@ -81,7 +80,6 @@ class ProductsController extends Controller
                     'brand' => $relatedProduct->brand,
                     'camera_type' => $relatedProduct->camera_type,
                     'images' => $relatedProduct->images,
-                    // Tambahan data diskon untuk related products
                     'discount_percentage' => $relatedProduct->discount_percentage,
                     'discount_start_date' => $relatedProduct->discount_start_date,
                     'discount_end_date' => $relatedProduct->discount_end_date,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
@@ -41,6 +41,9 @@ export default function ProductShow({ product, categories, brands }) {
         }
     };
 
+    console.log(product);
+    
+
     return (
         <AdminLayout>
             <Head title={`Detail Produk - ${product.name}`} />
@@ -58,33 +61,33 @@ export default function ProductShow({ product, categories, brands }) {
                 <div className="flex space-x-2">
                     <Link
                         href={route('admin.products.edit', product.id)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md flex items-center"
+                        className="flex items-center px-4 py-2 text-white bg-blue-500 rounded-md"
                     >
                         <FiEdit className="mr-2" /> Edit
                     </Link>
                     <button
                         onClick={handleDelete}
-                        className="px-4 py-2 bg-red-500 text-white rounded-md flex items-center"
+                        className="flex items-center px-4 py-2 text-white bg-red-500 rounded-md"
                     >
                         <FiTrash2 className="mr-2" /> Hapus
                     </button>
                 </div>
             </div>
             
-            <div className="bg-white rounded-md shadow-sm overflow-hidden">
+            <div className="overflow-hidden bg-white rounded-md shadow-sm">
                 <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                         <div className="md:col-span-1">
-                            <div className="bg-gray-100 rounded-md p-4 flex items-center justify-center h-64">
+                            <div className="flex justify-center items-center p-4 h-64 bg-gray-100 rounded-md">
                                 {product.image_path ? (
                                     <img
                                         src={product.image_path}
                                         alt={product.name}
-                                        className="max-h-full max-w-full object-contain"
+                                        className="object-contain max-w-full max-h-full"
                                     />
                                 ) : (
-                                    <div className="text-gray-400 text-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="text-center text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto mb-2 w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                         <p>Tidak ada gambar</p>
@@ -93,8 +96,8 @@ export default function ProductShow({ product, categories, brands }) {
                             </div>
                             
                             <div className="mt-4">
-                                <h3 className="text-lg font-medium mb-2">Informasi Produk</h3>
-                                <div className="bg-gray-50 rounded-md p-4">
+                                <h3 className="mb-2 text-lg font-medium">Informasi Produk</h3>
+                                <div className="p-4 bg-gray-50 rounded-md">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-sm text-gray-500">ID Produk</p>
@@ -116,27 +119,36 @@ export default function ProductShow({ product, categories, brands }) {
                                             <p className="text-sm text-gray-500">Tipe Kamera</p>
                                             <p className="font-medium">{product.camera_type || '-'}</p>
                                         </div>
-                                        <div className="bg-white overflow-hidden shadow rounded-lg">
-                                            <div className="px-4 py-5 sm:p-6">
-                                                <dt className="text-sm font-medium text-gray-500 truncate">Harga per Hari</dt>
-                                                <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                                                    {product.has_active_discount ? (
-                                                        <div className="flex flex-col">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-green-600">{formatRupiah(product.discounted_price)}</span>
-                                                                <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
-                                                                    -{product.discount_percentage}% OFF
-                                                                </span>
-                                                            </div>
-                                                            <span className="text-sm text-gray-500 line-through">
-                                                                {formatRupiah(product.price_per_day)}
-                                                            </span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-green-600">{formatRupiah(product.price_per_day)}</span>
-                                                    )}
-                                                </dd>
-                                            </div>
+                                        <div className="col-span-2">
+                                            <p className="text-sm text-gray-500">Harga per Hari</p>
+                                            {product.is_on_sale && product.discount_end_date && new Date(product.discount_end_date) >= new Date() ? (
+                                                <div className="flex flex-col">
+                                                    <div className="flex gap-2 items-center">
+                                                        <span className="text-lg font-semibold text-green-600">
+                                                            {product.discount_percentage > 0 
+                                                                ? formatRupiah(product.price_per_day * (1 - product.discount_percentage / 100))
+                                                                : formatRupiah(product.price_per_day - product.discount_amount)
+                                                            }
+                                                        </span>
+                                                        <span className="px-2 py-1 text-xs text-red-600 bg-red-100 rounded-full">
+                                                            {product.discount_percentage > 0 
+                                                                ? `-${product.discount_percentage}% OFF`
+                                                                : `-${formatRupiah(product.discount_amount)} OFF`
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-sm text-gray-500 line-through">
+                                                        {formatRupiah(product.price_per_day)}
+                                                    </span>
+                                                    <span className="mt-1 text-xs text-gray-400">
+                                                        Berlaku sampai: {new Date(product.discount_end_date).toLocaleString('id-ID')}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-lg font-semibold text-green-600">
+                                                    {formatRupiah(product.price_per_day)}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -144,20 +156,20 @@ export default function ProductShow({ product, categories, brands }) {
                         </div>
                         
                         <div className="md:col-span-2">
-                            <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
+                            <h2 className="mb-2 text-xl font-semibold">{product.name}</h2>
                             
                             <div className="mb-6">
-                                <h3 className="text-lg font-medium mb-2">Deskripsi</h3>
-                                <div className="bg-gray-50 rounded-md p-4">
+                                <h3 className="mb-2 text-lg font-medium">Deskripsi</h3>
+                                <div className="p-4 bg-gray-50 rounded-md">
                                     <p className="text-gray-700 whitespace-pre-line">{product.description || 'Tidak ada deskripsi'}</p>
                                 </div>
                             </div>
                             
                             <div className="mb-6">
-                                <h3 className="text-lg font-medium mb-2">Spesifikasi</h3>
-                                <div className="bg-gray-50 rounded-md p-4">
+                                <h3 className="mb-2 text-lg font-medium">Spesifikasi</h3>
+                                <div className="p-4 bg-gray-50 rounded-md">
                                     {product.specifications ? (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             {Object.entries(product.specifications).map(([key, value]) => (
                                                 <div key={key}>
                                                     <p className="text-sm text-gray-500">{key}</p>
@@ -172,12 +184,12 @@ export default function ProductShow({ product, categories, brands }) {
                             </div>
                             
                             <div className="mb-6">
-                                <h3 className="text-lg font-medium mb-2">Riwayat Pembaruan</h3>
-                                <div className="bg-gray-50 rounded-md p-4">
+                                <h3 className="mb-2 text-lg font-medium">Riwayat Pembaruan</h3>
+                                <div className="p-4 bg-gray-50 rounded-md">
                                     <p className="text-sm text-gray-500">Dibuat pada</p>
                                     <p className="font-medium">{moment(product.created_at).format('DD MMMM YYYY, HH:mm')}</p>
                                     
-                                    <p className="text-sm text-gray-500 mt-2">Terakhir diperbarui</p>
+                                    <p className="mt-2 text-sm text-gray-500">Terakhir diperbarui</p>
                                     <p className="font-medium">{moment(product.updated_at).format('DD MMMM YYYY, HH:mm')}</p>
                                 </div>
                             </div>
@@ -187,42 +199,42 @@ export default function ProductShow({ product, categories, brands }) {
             </div>
             
             <div className="mt-8">
-                <h3 className="text-lg font-medium mb-4">Ketersediaan Produk</h3>
+                <h3 className="mb-4 text-lg font-medium">Ketersediaan Produk</h3>
                 
                 <div className="mb-4">
-                    <label htmlFor="month" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="month" className="block mb-1 text-sm font-medium text-gray-700">
                         Pilih Bulan
                     </label>
                     <input
                         type="month"
                         id="month"
-                        className="border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        className="rounded-md border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
                         value={currentMonth}
                         onChange={(e) => setCurrentMonth(e.target.value)}
                     />
                 </div>
                 
                 {isLoading ? (
-                    <div className="text-center py-4 bg-white rounded-md shadow-sm">
-                        <svg className="animate-spin h-8 w-8 text-primary mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <div className="py-4 text-center bg-white rounded-md shadow-sm">
+                        <svg className="mx-auto w-8 h-8 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         <p className="mt-2 text-gray-600">Memuat data ketersediaan...</p>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-md shadow-sm overflow-hidden">
+                    <div className="overflow-hidden bg-white rounded-md shadow-sm">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                             Tanggal
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                             Tersedia
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                             Booking
                                         </th>
                                     </tr>
