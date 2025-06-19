@@ -143,9 +143,21 @@ class OrderController extends Controller
      */
     public function create()
     {
-        // Change this line - use 'stock' instead of 'is_available'
         $users = \App\Models\User::where('role', 'user')->get();
-        $products = \App\Models\Product::where('stock', '>', 0)->get();
+        $products = \App\Models\Product::with('images')->get()->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price_per_day' => $product->price_per_day,
+                'discount_percentage' => $product->discount_percentage,
+                'discount_amount' => $product->discount_amount,
+                'discount_start_date' => $product->discount_start_date,
+                'discount_end_date' => $product->discount_end_date,
+                'is_on_sale' => $product->is_on_sale,
+                'has_active_discount' => $product->hasActiveDiscount(),
+                'discounted_price' => $product->getDiscountedPrice(),
+            ];
+        });
         
         return Inertia::render('Admin/Orders/Create', [
             'users' => $users,
@@ -181,7 +193,8 @@ class OrderController extends Controller
         $totalPrice = 0;
         foreach ($validated['items'] as $item) {
             $product = \App\Models\Product::find($item['product_id']);
-            $totalPrice += $product->price_per_day * $item['quantity'] * $duration;
+            $pricePerDay = $product->hasActiveDiscount() ? $product->getDiscountedPrice() : $product->price_per_day;
+            $totalPrice += $pricePerDay * $item['quantity'] * $duration;
         }
         
         // Create order
@@ -202,13 +215,14 @@ class OrderController extends Controller
         // Create order items
         foreach ($validated['items'] as $item) {
             $product = \App\Models\Product::find($item['product_id']);
+            $pricePerDay = $product->hasActiveDiscount() ? $product->getDiscountedPrice() : $product->price_per_day;
             $order->orderItems()->create([
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
-                'price_per_day' => $product->price_per_day,
-                'rental_cost' => $product->price_per_day * $item['quantity'] * $duration,
-                'address' => $validated['pickup_method'] === 'delivery' ? 'Store pickup' : 'Store pickup', // Add this line
-                'pickup_method' => $validated['pickup_method'], // Add this line
+                'price_per_day' => $pricePerDay,
+                'rental_cost' => $pricePerDay * $item['quantity'] * $duration,
+                'address' => $validated['pickup_method'] === 'delivery' ? 'Store pickup' : 'Store pickup',
+                'pickup_method' => $validated['pickup_method'],
             ]);
         }
         

@@ -52,7 +52,8 @@ export default function CreateOrder({ users, products }) {
             data.items.forEach((item, index) => {
                 const product = selectedProducts[index];
                 if (product && item.quantity > 0) {
-                    total += product.price_per_day * item.quantity * diffDays;
+                    const pricePerDay = product.has_active_discount ? product.discounted_price : product.price_per_day;
+                    total += pricePerDay * item.quantity * diffDays;
                 }
             });
             setTotalPrice(total);
@@ -287,7 +288,10 @@ export default function CreateOrder({ users, products }) {
                                     <option value="">Select a product</option>
                                     {products.map((product) => (
                                         <option key={product.id} value={product.id}>
-                                            {product.name} - {formatRupiah(product.price_per_day)}/day
+                                            {product.name} - {product.has_active_discount ? 
+                                                `${formatRupiah(product.discounted_price)}/day (Diskon ${product.discount_percentage}%)` : 
+                                                `${formatRupiah(product.price_per_day)}/day`
+                                            }
                                         </option>
                                     ))}
                                 </select>
