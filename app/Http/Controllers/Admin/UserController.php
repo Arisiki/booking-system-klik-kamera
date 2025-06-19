@@ -90,22 +90,22 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8',
+            'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:admin,user',
         ]);
-
+    
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'role' => $validated['role'],
         ]);
-
+    
         if (!empty($validated['password'])) {
             $user->update([
                 'password' => Hash::make($validated['password']),
             ]);
         }
-
+    
         return redirect()->route('admin.users.index')
             ->with('success', 'User updated successfully.');
     }
