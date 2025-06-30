@@ -130,6 +130,9 @@ export default function Orders() {
                                                             month: "long",
                                                             year: "numeric",
                                                         })}
+                                                        {order.pickup_time && (
+                                                            <span className="text-secondary ml-2">• {order.pickup_time}</span>
+                                                        )}
                                                     </p>
                                                 </div>
                                                 <div>
@@ -140,6 +143,9 @@ export default function Orders() {
                                                             month: "long",
                                                             year: "numeric",
                                                         })}
+                                                        {order.return_time && (
+                                                            <span className="text-secondary ml-2">• {order.return_time}</span>
+                                                        )}
                                                     </p>
                                                 </div>
                                             </div>

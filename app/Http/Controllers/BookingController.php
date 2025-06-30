@@ -101,12 +101,14 @@ class BookingController extends Controller
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
             'pickup_method' => 'required|in:pickup,home_delivery',
+            'pickup_time' => 'required|date_format:H:i',
+            'return_time' => 'required|date_format:H:i|after:pickup_time',
             'pickupAddress' => 'required_if:pickup_method,pickup|nullable|string',
             'userName' => 'required|string|max:25',
             'email' => 'required|email',
             'phoneNumber' => 'required|numeric'
         ]);
-    
+
         // Cek ketersediaan
         if (!$product->isAvailableForDates($request->start_date, $request->end_date)) {
             return back()->withErrors(['quantity' => 'Product is not available for the selected dates.']);
@@ -131,6 +133,8 @@ class BookingController extends Controller
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'pickup_method' => $request->pickup_method,
+            'pickup_time' => $request->pickup_time,
+            'return_time' => $request->return_time,
             'address' => $request->pickupAddress,
             'total_cost' => $rentalCost,
             'status' => 'pending',
@@ -146,7 +150,9 @@ class BookingController extends Controller
             'quantity' => $request->quantity,
             'rental_cost' => $rentalCost,
             'address' => $request->pickupAddress,
-            'pickup_method' => $request->pickup_method
+            'pickup_method' => $request->pickup_method,
+            'pickup_time' => $request->pickup_time,
+            'return_time' => $request->return_time
         ]);
     
         CancelOrderJob::dispatch($order->id)->delay(now()->addHour(3));
