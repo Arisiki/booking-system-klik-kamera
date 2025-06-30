@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrdersFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -19,6 +18,8 @@ class Order extends Model
         'start_date',
         'end_date',
         'pickup_method',
+        'pickup_time',
+        'return_time',
         'total_cost',
         'status',
         'admin_notes',
@@ -28,6 +29,8 @@ class Order extends Model
         'order_date' => 'datetime',
         'start_date' => 'date',
         'end_date' => 'date',
+        'pickup_time' => 'datetime:H:i',
+        'return_time' => 'datetime:H:i',
         'pickup_method' => 'string',
         'total_cost' => 'decimal:2',
         'status' => 'string',

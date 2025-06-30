@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItems extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrderItemsFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -16,12 +15,16 @@ class OrderItems extends Model
         'quantity',
         'rental_cost',
         'pickup_method',
+        'pickup_time',
+        'return_time',
         'address'
     ];
 
     protected $casts = [
         'quantity' => 'integer',
-        'rental_cost' => 'decimal:2'
+        'rental_cost' => 'decimal:2',
+        'pickup_time' => 'datetime:H:i',
+        'return_time' => 'datetime:H:i',
     ];
 
     //relations

@@ -173,6 +173,9 @@ export default function OrdersIndex({ orders, filters, statuses }) {
                                     Rental Period
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Pickup/Return Time
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Created At
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -216,6 +219,18 @@ export default function OrdersIndex({ orders, filters, statuses }) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900">
+                                                <div className="flex items-center text-green-600">
+                                                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                                                    Pickup: {order.pickup_time_formatted || 'Not set'}
+                                                </div>
+                                                <div className="flex items-center text-red-600 mt-1">
+                                                    <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                                                    Return: {order.return_time_formatted || 'Not set'}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm text-gray-500">
                                                 {new Date(order.created_at).toLocaleDateString()}
                                             </div>
@@ -232,7 +247,7 @@ export default function OrdersIndex({ orders, filters, statuses }) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
+                                    <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
                                         No orders found
                                     </td>
                                 </tr>

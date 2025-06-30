@@ -12,6 +12,8 @@ export default function CreateOrder({ users, products }) {
         phone_number: '',
         start_date: '',
         end_date: '',
+        pickup_time: '09:00',
+        return_time: '17:00',
         pickup_method: 'pickup',
         items: [{ product_id: '', quantity: 1 }],
         is_offline: true,
@@ -233,6 +235,36 @@ export default function CreateOrder({ users, products }) {
                                     min={data.start_date}
                                 />
                                 {errors.end_date && <div className="text-red-500 text-sm mt-1">{errors.end_date}</div>}
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label htmlFor="pickup_time" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Pickup Time
+                                    </label>
+                                    <input
+                                        type="time"
+                                        id="pickup_time"
+                                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                                        value={data.pickup_time}
+                                        onChange={(e) => setData('pickup_time', e.target.value)}
+                                    />
+                                    {errors.pickup_time && <div className="text-red-500 text-sm mt-1">{errors.pickup_time}</div>}
+                                </div>
+                                
+                                <div>
+                                    <label htmlFor="return_time" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Return Time
+                                    </label>
+                                    <input
+                                        type="time"
+                                        id="return_time"
+                                        className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                                        value={data.return_time}
+                                        onChange={(e) => setData('return_time', e.target.value)}
+                                    />
+                                    {errors.return_time && <div className="text-red-500 text-sm mt-1">{errors.return_time}</div>}
+                                </div>
                             </div>
                             
                             <div className="mb-4">

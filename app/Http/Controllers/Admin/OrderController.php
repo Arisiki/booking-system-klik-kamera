@@ -35,6 +35,13 @@ class OrderController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Add pickup_time and return_time to each order for display
+        $orders->getCollection()->transform(function ($order) {
+            $order->pickup_time_formatted = $order->pickup_time ? date('H:i', strtotime($order->pickup_time)) : null;
+            $order->return_time_formatted = $order->return_time ? date('H:i', strtotime($order->return_time)) : null;
+            return $order;
+        });
+
         return Inertia::render('Admin/Orders/Index', [
             'orders' => $orders,
             'filters' => $request->only(['search', 'status', 'date_from', 'date_to']),
@@ -118,7 +125,7 @@ class OrderController extends Controller
         
         $callback = function() use ($orders) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['Order ID', 'Customer', 'Email', 'Phone', 'Total', 'Status', 'Created At']);
+            fputcsv($file, ['Order ID', 'Customer', 'Email', 'Phone', 'Total', 'Status', 'Pickup Time', 'Return Time', 'Created At']);
             
             foreach ($orders as $order) {
                 fputcsv($file, [
@@ -128,6 +135,8 @@ class OrderController extends Controller
                     $order->phone_number ?? 'N/A',
                     $order->total_cost,
                     $order->status,
+                    $order->pickup_time ?? 'N/A',
+                    $order->return_time ?? 'N/A',
                     $order->created_at->format('Y-m-d H:i:s')
                 ]);
             }
@@ -177,6 +186,8 @@ class OrderController extends Controller
             'phone_number' => 'required|string|max:20',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
+            'pickup_time' => 'required|date_format:H:i',
+            'return_time' => 'required|date_format:H:i',
             'pickup_method' => 'required|in:pickup,delivery',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
@@ -206,6 +217,8 @@ class OrderController extends Controller
             'order_date' => now(),
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
+            'pickup_time' => $validated['pickup_time'],
+            'return_time' => $validated['return_time'],
             'pickup_method' => $validated['pickup_method'],
             'total_cost' => $totalPrice,
             'status' => 'booked', 
@@ -223,6 +236,8 @@ class OrderController extends Controller
                 'rental_cost' => $pricePerDay * $item['quantity'] * $duration,
                 'address' => $validated['pickup_method'] === 'delivery' ? 'Store pickup' : 'Store pickup',
                 'pickup_method' => $validated['pickup_method'],
+                'pickup_time' => $validated['pickup_time'],
+                'return_time' => $validated['return_time'],
             ]);
         }
         

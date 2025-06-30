@@ -8,7 +8,7 @@ import MapPicker from "@/Components/MapPicker";
 import { address } from "@/data";
 import axios from "axios";
 import { IoIosCloseCircle, IoMdClose } from "react-icons/io";
-import { LuPhone, LuUser } from "react-icons/lu";
+import { LuPhone, LuUser, LuClock } from "react-icons/lu";
 import { MdOutlineMail } from "react-icons/md";
 import { FiBox } from "react-icons/fi";
 
@@ -35,6 +35,8 @@ export default function BookingForms({
         start_date: format(new Date(), "yyyy-MM-dd"),
         end_date: format(new Date(), "yyyy-MM-dd"),
         pickup_method: "pickup", 
+        pickup_time: "09:00",
+        return_time: "17:00",
         pickupAddress: isExtend
             ? extendAddress
             : address && address.length > 0
@@ -167,22 +169,22 @@ export default function BookingForms({
     };
 
     return (
-        <div className="border border-dark rounded-xl overflow-hidden pb-4 md:pb-8 bg-white absolute top-0 md:top-10 left-0 right-0 laptop:w-fit  mx-auto z-[100]">
-            <div div className="w-full w h-14 bg-dark flex items-center justify-between mb-5 px-4">
-                <h3 className="text-xl text-white font-bold text-center">Booking Form - <span className="text-[#FFD152]">{product.name}</span></h3>
+        <div className="border border-dark rounded-xl overflow-hidden pb-4 md:pb-8 bg-white absolute top-0 md:top-10 left-0 right-0 laptop:w-fit mx-auto z-[100]">
+            <div div className="flex justify-between items-center px-4 mb-5 w-full h-14 w bg-dark">
+                <h3 className="text-xl font-bold text-center text-white">Booking Form - <span className="text-[#FFD152]">{product.name}</span></h3>
                 <button onClick={onClose}>
-                    <IoIosCloseCircle className="text-white h-10 w-10"/>
+                    <IoIosCloseCircle className="w-10 h-10 text-white"/>
                 </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="mx-5 flex flex-col gap-8 md:mx-8">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-8 mx-5 md:mx-8">
                 <div className="flex flex-col lg:flex-row lg:gap-8 lg:justify-start lg:items-start">
                     <div className="flex flex-col gap-8">
-                        <div className="flex flex-col gap-8 md:flex-row justify-between">
-                            <div className="w-full md:w-1/2 flex flex-col gap-4 md:gap-8">
+                        <div className="flex flex-col gap-8 justify-between md:flex-row">
+                            <div className="flex flex-col gap-4 w-full md:w-1/2 md:gap-8">
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm md:text-base font-semibold">Nama</label>
-                                    <div className="w-full relative">
+                                    <label className="text-sm font-semibold md:text-base">Nama</label>
+                                    <div className="relative w-full">
                                         <input
                                             type="text"
                                             value={data.userName}
@@ -190,66 +192,66 @@ export default function BookingForms({
                                             maxLength={25}
                                             required
                                             placeholder="tambahkan nama"
-                                            className="rounded-xl border border-thrid/20 w-full focus:border-primary focus:ring-0"
+                                            className="w-full rounded-xl border border-thrid/20 focus:border-primary focus:ring-0"
                                         />
-                                        <LuUser className="absolute right-3 top-1/2 -translate-y-1/2 text-thrid/30 w-5 h-5" />
+                                        <LuUser className="absolute right-3 top-1/2 w-5 h-5 -translate-y-1/2 text-thrid/30" />
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm md:text-base font-semibold">Email</label>
-                                    <div className="w-full relative">
+                                    <label className="text-sm font-semibold md:text-base">Email</label>
+                                    <div className="relative w-full">
                                         <input
                                             type="email"
                                             value={data.email}
                                             onChange={(e) => setData("email", e.target.value)}
                                             required
                                             placeholder="tambahkan email"
-                                            className="rounded-xl border border-thrid/20 w-full focus:border-primary focus:ring-0"
+                                            className="w-full rounded-xl border border-thrid/20 focus:border-primary focus:ring-0"
                                         />
-                                        <MdOutlineMail className="absolute right-3 top-1/2 -translate-y-1/2 text-thrid/30 w-5 h-5"/>
+                                        <MdOutlineMail className="absolute right-3 top-1/2 w-5 h-5 -translate-y-1/2 text-thrid/30"/>
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm md:text-base font-semibold">No Hp</label>
-                                    <div className="w-full relative">
+                                    <label className="text-sm font-semibold md:text-base">No Hp</label>
+                                    <div className="relative w-full">
                                         <input
                                             type="number"
                                             value={data.phoneNumber}
                                             onChange={(e) => setData("phoneNumber", e.target.value)}
                                             required
                                             placeholder="tambahkan no hp"
-                                            className="rounded-xl border border-thrid/20 w-full focus:border-primary focus:ring-0"
+                                            className="w-full rounded-xl border border-thrid/20 focus:border-primary focus:ring-0"
                                         />
-                                        <LuPhone className="absolute right-3 top-1/2 -translate-y-1/2 text-thrid/30 w-5 h-5"/>
+                                        <LuPhone className="absolute right-3 top-1/2 w-5 h-5 -translate-y-1/2 text-thrid/30"/>
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-sm md:text-base font-semibold">Quantity:</label>
-                                    <div className="w-full relative">
+                                    <label className="text-sm font-semibold md:text-base">Quantity:</label>
+                                    <div className="relative w-full">
                                         <input
                                             type="number"
                                             value={data.quantity}
                                             onChange={handleQuantityChange}
                                             min="1"
                                             max={product.stock}
-                                            className="rounded-xl border border-thrid/20 w-full focus:border-primary focus:ring-0"
+                                            className="w-full rounded-xl border border-thrid/20 focus:border-primary focus:ring-0"
                                         />
-                                        <FiBox className="absolute right-3 top-1/2 -translate-y-1/2 text-thrid/30 w-5 h-5" />
+                                        <FiBox className="absolute right-3 top-1/2 w-5 h-5 -translate-y-1/2 text-thrid/30" />
                                         
                                     </div>
-                                    <span className="text-secondary text-sm">Sisa stock: {product.stock}</span>
+                                    <span className="text-sm text-secondary">Sisa stock: {product.stock}</span>
                                     {errors.quantity && <span>{errors.quantity}</span>}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-2 lg:max-w-[392px]">
-                                <label className="text-sm md:text-base font-semibold">Select Date Range:</label>
+                                <label className="text-sm font-semibold md:text-base">Select Date Range:</label>
                                 <DateRange
                                     ranges={[dateRange]}
                                     onChange={handleDateChange}
                                     disabledDates={disabledDates}
                                     minDate={new Date()}
                                     dateDisplayFormat="yyyy-MM-dd"
-                                    className="w-fit overflow-hidden border rounded-xl"
+                                    className="overflow-hidden rounded-xl border w-fit"
                                     direction="vertical"
                                     rangeColors={['#2D5D7C']}
                                     color="#2D5D7C"
@@ -261,11 +263,39 @@ export default function BookingForms({
                                 {errors.start_date && <span>{errors.start_date}</span>}
                                 {errors.end_date && <span>{errors.end_date}</span>}
                             </div>
+                            <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-semibold md:text-base">Jam Pengambilan</label>
+                                    <div className="relative w-full">
+                                        <input
+                                            type="time"
+                                            value={data.pickup_time}
+                                            onChange={(e) => setData("pickup_time", e.target.value)}
+                                            min="08:00"
+                                            max="20:00"
+                                            required
+                                            className="w-full rounded-xl border border-thrid/20 focus:border-primary focus:ring-0"
+                                        />
+                                    </div>
+                                    <span className="text-xs text-thrid/70">Jam operasional: 08:00 - 20:00</span>
+                                    <label className="text-sm font-semibold md:text-base">Jam Pengembalian</label>
+                                    <div className="relative w-full">
+                                        <input
+                                            type="time"
+                                            value={data.return_time}
+                                            onChange={(e) => setData("return_time", e.target.value)}
+                                            min="08:00"
+                                            max="20:00"
+                                            required
+                                            className="w-full rounded-xl border border-thrid/20 focus:border-primary focus:ring-0"
+                                        />
+                                    </div>
+                                    <span className="text-xs text-thrid/70">Jam operasional: 08:00 - 20:00</span>
+                                </div>
                         </div>
 
                         {!isExtend && (
                             <div className="flex flex-col gap-2">
-                                <label className="text-sm md:text-base font-semibold">Lokasi Pengambilan:</label>
+                                <label className="text-sm font-semibold md:text-base">Lokasi Pengambilan:</label>
                                 <div className="flex flex-col gap-8 md:flex-row md:justify-between md:gap-0 laptop:gap-8">
                                     <label className={`flex flex-col gap-2 border ${data.pickupAddress === address[0].value && ' border-secondary'} p-5 rounded-3xl`}>
                                         <input
@@ -287,6 +317,7 @@ export default function BookingForms({
                                             </p>
                                         </div>
                                     </label>
+                                    
                                     <label className={`flex flex-col gap-2 border ${data.pickupAddress === address[1].value && ' border-secondary'} p-5 rounded-3xl`}>
                                         <input
                                             type="radio"
@@ -297,7 +328,7 @@ export default function BookingForms({
                                             }}
                                             className="text-secondary focus:ring-acccent"
                                         />
-                                        <div className="flex flex-col items-center gap-4">
+                                        <div className="flex flex-col gap-4 items-center">
                                             <img src="/icons/Kayubihi.svg" alt="penatih icon" className={`max-w-[208px] ${data.pickupAddress !== address[1].value && 'grayscale'}`} />
                                             <p className={`${data.pickupAddress === address[1].value && 'text-secondary'} text-center`}>
                                                 Konter Kayubihi
@@ -317,7 +348,7 @@ export default function BookingForms({
                                             }}
                                             className="text-secondary focus:ring-acccent"
                                         />
-                                        <div className="flex flex-col items-center gap-4">
+                                        <div className="flex flex-col gap-4 items-center">
                                             <img src="/icons/Map.svg" alt="penatih icon" className={`max-w-[208px] ${data.pickup_method !== "home_delivery" && 'grayscale'}`} />
                                             <p className={`${data.pickup_method === "home_delivery" && 'text-secondary'}`}>Home Delivery</p>
                                         </div>
@@ -347,11 +378,11 @@ export default function BookingForms({
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-4 md:flex-row md:justify-end mt-6">
-                    <button className="bg-primary text-white w-full md:w-1/2  rounded-xl py-3 md:order-2 md:max-w-32" type="submit" disabled={processing || dateError}>
+                <div className="flex flex-col gap-4 mt-6 md:flex-row md:justify-end">
+                    <button className="py-3 w-full text-white rounded-xl bg-primary md:w-1/2 md:order-2 md:max-w-32" type="submit" disabled={processing || dateError}>
                         {isAddToCart ? "Add to Cart" : "Book Now"}
                     </button>
-                    <button className="border border-red-700 w-full md:w-1/2 rounded-xl py-3 text-red-700 md:max-w-32" type="button" onClick={onClose}>
+                    <button className="py-3 w-full text-red-700 rounded-xl border border-red-700 md:w-1/2 md:max-w-32" type="button" onClick={onClose}>
                         Cancel
                     </button>
                 </div>
