@@ -15,20 +15,20 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $orders = Order::with(['user', 'orderItems.product'])
-            ->when($request->search, function($query, $search) {
+            ->when($request->search, function ($query, $search) {
                 $query->where('id', 'like', "%{$search}%")
-                    ->orWhereHas('user', function($q) use ($search) {
+                    ->orWhereHas('user', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%")
-                          ->orWhere('email', 'like', "%{$search}%");
+                            ->orWhere('email', 'like', "%{$search}%");
                     });
             })
-            ->when($request->status, function($query, $status) {
+            ->when($request->status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->when($request->date_from, function($query, $dateFrom) {
+            ->when($request->date_from, function ($query, $dateFrom) {
                 $query->whereDate('created_at', '>=', $dateFrom);
             })
-            ->when($request->date_to, function($query, $dateTo) {
+            ->when($request->date_to, function ($query, $dateTo) {
                 $query->whereDate('created_at', '<=', $dateTo);
             })
             ->orderBy('created_at', 'desc')
@@ -47,6 +47,7 @@ class OrderController extends Controller
             'filters' => $request->only(['search', 'status', 'date_from', 'date_to']),
             'statuses' => [
                 'pending' => 'Pending',
+                'waiting_confirmation' => 'Waiting Confirmation',
                 'payment_complete' => 'Payment Complete',
                 'booked' => 'Booked',
                 'being_returned' => 'Being Returned',
@@ -67,6 +68,7 @@ class OrderController extends Controller
             'order' => $order,
             'statuses' => [
                 'pending' => 'Pending',
+                'waiting_confirmation' => 'Waiting Confirmation',
                 'payment_complete' => 'Payment Complete',
                 'booked' => 'Booked',
                 'being_returned' => 'Being Returned',
@@ -82,15 +84,15 @@ class OrderController extends Controller
     public function updateStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,payment_complete,booked,being_returned,completed,cancelled',
+            'status' => 'required|in:pending,waiting_confirmation,payment_complete,booked,being_returned,completed,cancelled',
             'admin_notes' => 'nullable|string|max:500',
         ]);
-    
+
         $order->update([
             'status' => $validated['status'],
             'admin_notes' => $validated['admin_notes'],
         ]);
-    
+
         return redirect()->back()->with('success', 'Order status updated successfully.');
     }
 
@@ -100,33 +102,33 @@ class OrderController extends Controller
     public function export(Request $request)
     {
         $orders = Order::with(['user', 'orderItems.product'])
-            ->when($request->search, function($query, $search) {
+            ->when($request->search, function ($query, $search) {
                 $query->where('id', 'like', "%{$search}%")
                     ->orWhere('user_name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             })
-            ->when($request->status, function($query, $status) {
+            ->when($request->status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->when($request->date_from, function($query, $dateFrom) {
+            ->when($request->date_from, function ($query, $dateFrom) {
                 $query->whereDate('created_at', '>=', $dateFrom);
             })
-            ->when($request->date_to, function($query, $dateTo) {
+            ->when($request->date_to, function ($query, $dateTo) {
                 $query->whereDate('created_at', '<=', $dateTo);
             })
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
         $filename = 'orders-' . date('Y-m-d') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ];
-        
-        $callback = function() use ($orders) {
+
+        $callback = function () use ($orders) {
             $file = fopen('php://output', 'w');
             fputcsv($file, ['Order ID', 'Customer', 'Email', 'Phone', 'Total', 'Status', 'Pickup Time', 'Return Time', 'Created At']);
-            
+
             foreach ($orders as $order) {
                 fputcsv($file, [
                     $order->id,
@@ -140,10 +142,10 @@ class OrderController extends Controller
                     $order->created_at->format('Y-m-d H:i:s')
                 ]);
             }
-            
+
             fclose($file);
         };
-        
+
         return response()->stream($callback, 200, $headers);
     }
 
@@ -167,7 +169,7 @@ class OrderController extends Controller
                 'discounted_price' => $product->getDiscountedPrice(),
             ];
         });
-        
+
         return Inertia::render('Admin/Orders/Create', [
             'users' => $users,
             'products' => $products,
@@ -180,7 +182,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'nullable|exists:users,id', 
+            'user_id' => 'nullable|exists:users,id',
             'user_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone_number' => 'required|string|max:20',
@@ -195,22 +197,22 @@ class OrderController extends Controller
             'payment_method' => 'required|string',
             'admin_notes' => 'nullable|string|max:500',
         ]);
-        
+
         // Calculate duration and total price
         $startDate = \Carbon\Carbon::parse($validated['start_date']);
         $endDate = \Carbon\Carbon::parse($validated['end_date']);
         $duration = $startDate->diffInDays($endDate);
-        
+
         $totalPrice = 0;
         foreach ($validated['items'] as $item) {
             $product = \App\Models\Product::find($item['product_id']);
             $pricePerDay = $product->hasActiveDiscount() ? $product->getDiscountedPrice() : $product->price_per_day;
             $totalPrice += $pricePerDay * $item['quantity'] * $duration;
         }
-        
+
         // Create order
         $order = Order::create([
-            'user_id' => $validated['user_id'] ?? null, 
+            'user_id' => $validated['user_id'] ?? null,
             'user_name' => $validated['user_name'],
             'email' => $validated['email'],
             'phone_number' => $validated['phone_number'],
@@ -221,10 +223,10 @@ class OrderController extends Controller
             'return_time' => $validated['return_time'],
             'pickup_method' => $validated['pickup_method'],
             'total_cost' => $totalPrice,
-            'status' => 'booked', 
+            'status' => 'booked',
             'admin_notes' => $validated['admin_notes'],
         ]);
-        
+
         // Create order items
         foreach ($validated['items'] as $item) {
             $product = \App\Models\Product::find($item['product_id']);
@@ -240,7 +242,7 @@ class OrderController extends Controller
                 'return_time' => $validated['return_time'],
             ]);
         }
-        
+
         // Create transaction record for offline payment
         $order->transaction()->create([
             'amount' => $totalPrice,
@@ -249,7 +251,7 @@ class OrderController extends Controller
             'is_offline' => true,
             'transaction_date' => now(),
         ]);
-        
+
         return redirect()->route('admin.orders.index')->with('success', 'Offline order created successfully.');
     }
 }

@@ -9,7 +9,7 @@ export default function Cart() {
     const { cartItems, totalCost, auth } = usePage().props;
     const { post, processing, data, setData } = useForm({
         userName: cartItems.length > 0 ? cartItems[0].user_name : auth.user.name
-    }); 
+    });
 
     const handleCheckout = () => {
         post(route('checkout'), {
@@ -20,7 +20,7 @@ export default function Cart() {
             onError: (errors) => console.log('Errors:', errors),
         });
     };
-    
+
     return (
         <>
             <Navbar />
@@ -47,7 +47,7 @@ export default function Cart() {
                             ))}
                         </div>
                     </section>
-                    
+
                     <div className='flex flex-col w-full laptop:w-2/4 gap-8'>
                         {/* Personal detail section */}
                         <section className='flex flex-col gap-3' >
@@ -75,7 +75,7 @@ export default function Cart() {
                         {/* Total Price section */}
                         <section className='flex flex-col gap-4'>
                             <h1 className='text-lg font-bold text-primary md:text-2xl'>Total Price</h1>
-                            <hr className='my-2'/>
+                            <hr className='my-2' />
                             <div className='flex flex-col gap-2'>
                                 {cartItems.map((item, i) => (
                                     <div
@@ -96,9 +96,23 @@ export default function Cart() {
                     </div>
                 </article>
             ) : (
-                <p className='h-screen'>Your cart is empty</p>
+                <div className='min-h-[60vh] flex flex-col items-center justify-center text-center px-4'>
+                    <div className="w-80 h-80 mb-6">
+                        <img src="/empty-cart.svg" alt="Empty Cart" className="w-full h-full object-contain" />
+                    </div>
+                    <h2 className='text-2xl font-bold text-gray-800 mb-2'>Keranjang Belanja Kosong</h2>
+                    <p className='text-gray-500 mb-8 max-w-md'>
+                        Sepertinya anda belum menambahkan produk apapun ke keranjang. Yuk cari kamera impianmu sekarang!
+                    </p>
+                    <Link
+                        href={route('products.index')}
+                        className='px-8 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                    >
+                        Mulai Belanja
+                    </Link>
+                </div>
             )}
-            
+
             <Footer />
         </>
     );
