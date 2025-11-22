@@ -15,7 +15,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\FacadesLog;
+use Illuminate\Support\Facades\DB;
+
 use Inertia\Inertia;
 
 
@@ -70,7 +71,7 @@ class BookingController extends Controller
             'phoneNumber' => 'required|numeric'
         ]);
 
-        
+
 
         try {
             CartHelper::addToCart(
@@ -113,51 +114,70 @@ class BookingController extends Controller
         if (!$product->isAvailableForDates($request->start_date, $request->end_date)) {
             return back()->withErrors(['quantity' => 'Product is not available for the selected dates.']);
         }
-    
+
         if ($request->quantity > $product->stock) {
             return back()->withErrors(['quantity' => 'Requested quantity exceeds available stock.']);
         }
-    
+
         // Ganti logika perhitungan biaya
         $rentalCalculation = $product->calculateRentalCost(
-            $request->start_date, 
-            $request->end_date, 
+            $request->start_date,
+            $request->end_date,
             $request->quantity
         );
         $rentalCost = $rentalCalculation['total_cost'];
-    
-        // Buat order
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'order_date' => now(),
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'pickup_method' => $request->pickup_method,
-            'pickup_time' => $request->pickup_time,
-            'return_time' => $request->return_time,
-            'address' => $request->pickupAddress,
-            'total_cost' => $rentalCost,
-            'status' => 'pending',
-            'user_name' => $request->userName,
-            'email' => $request->email,
-            'phone_number' => $request->phoneNumber
-        ]);
-    
-        // Buat order item
-        OrderItems::create([
-            'order_id' => $order->id,
-            'product_id' => $product->id,
-            'quantity' => $request->quantity,
-            'rental_cost' => $rentalCost,
-            'address' => $request->pickupAddress,
-            'pickup_method' => $request->pickup_method,
-            'pickup_time' => $request->pickup_time,
-            'return_time' => $request->return_time
-        ]);
-    
-        CancelOrderJob::dispatch($order->id)->delay(now()->addHour(3));
-    
-        return redirect()->route('checkout.show', $order->id)->with('success', 'Order created successfully!');
+
+        // Gunakan database transaction untuk memastikan data konsisten dan mencegah race condition
+        try {
+            return DB::transaction(function () use ($request, $product, $rentalCost) {
+                // Lock product row untuk mencegah race condition (double booking)
+                $lockedProduct = Product::where('id', $product->id)->lockForUpdate()->first();
+
+                // Cek ketersediaan lagi setelah lock
+                if (!$lockedProduct->isAvailableForDates($request->start_date, $request->end_date)) {
+                    throw new \Exception('Product is not available for the selected dates.');
+                }
+
+                if ($request->quantity > $lockedProduct->stock) {
+                    throw new \Exception('Requested quantity exceeds available stock.');
+                }
+
+                // Buat order
+                $order = Order::create([
+                    'user_id' => auth()->id(),
+                    'order_date' => now(),
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date,
+                    'pickup_method' => $request->pickup_method,
+                    'pickup_time' => $request->pickup_time,
+                    'return_time' => $request->return_time,
+                    'address' => $request->pickupAddress,
+                    'total_cost' => $rentalCost,
+                    'status' => 'pending',
+                    'user_name' => $request->userName,
+                    'email' => $request->email,
+                    'phone_number' => $request->phoneNumber
+                ]);
+
+                // Buat order item
+                OrderItems::create([
+                    'order_id' => $order->id,
+                    'product_id' => $lockedProduct->id,
+                    'quantity' => $request->quantity,
+                    'rental_cost' => $rentalCost,
+                    'address' => $request->pickupAddress,
+                    'pickup_method' => $request->pickup_method,
+                    'pickup_time' => $request->pickup_time,
+                    'return_time' => $request->return_time
+                ]);
+
+                CancelOrderJob::dispatch($order->id)->delay(now()->addHours(3));
+
+                return redirect()->route('checkout.show', $order->id)->with('success', 'Order created successfully!');
+            });
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -193,50 +213,75 @@ class BookingController extends Controller
         $firstItem = is_array(reset($cartItems)) ? reset($cartItems) : $cartItems[0];
 
         // Validasi data yang diperlukan
-        if (!isset($firstItem['pickup_method']) || !isset($firstItem['pickup_address']) || 
-            !isset($firstItem['user_name']) || !isset($firstItem['email']) || 
-            !isset($firstItem['phone_number'])) {
+        if (
+            !isset($firstItem['pickup_method']) || !isset($firstItem['pickup_address']) ||
+            !isset($firstItem['user_name']) || !isset($firstItem['email']) ||
+            !isset($firstItem['phone_number'])
+        ) {
             return redirect('/cart')->withErrors(['error' => 'Missing required cart data.']);
         }
 
         try {
-            $order = Order::create([
-                'user_id' => auth()->id(),
-                'order_date' => now(),
-                'start_date' => collect($cartItems)->min('start_date'),
-                'end_date' => collect($cartItems)->max('end_date'),
-                'pickup_method' => $firstItem['pickup_method'],
-                'address' => $firstItem['pickup_address'],
-                'user_name' => $firstItem['user_name'],
-                'email' => $firstItem['email'],
-                'phone_number' => $firstItem['phone_number'],
-                'total_cost' => collect($cartItems)->sum('rental_cost'),
-                'status' => 'pending',
-            ]);
+            return DB::transaction(function () use ($cartItems, $firstItem) {
+                // 1. Validasi ulang stok untuk SEMUA item dalam cart sebelum membuat order
+                foreach ($cartItems as $item) {
+                    // Lock product untuk mencegah race condition
+                    $lockedProduct = Product::where('id', $item['product']['id'])->lockForUpdate()->first();
 
-            foreach ($cartItems as $item) {
-                OrderItems::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item['product']['id'],
-                    'quantity' => $item['quantity'],
-                    'address' => $item['pickup_address'],
-                    'pickup_method' => $item['pickup_method'],
-                    'rental_cost' => $item['rental_cost'],
+                    if (!$lockedProduct) {
+                        throw new \Exception("Product {$item['product']['name']} not found.");
+                    }
+
+                    if (!$lockedProduct->isAvailableForDates($item['start_date'], $item['end_date'])) {
+                        throw new \Exception("Product {$lockedProduct->name} is no longer available for the selected dates.");
+                    }
+
+                    if ($item['quantity'] > $lockedProduct->stock) {
+                        throw new \Exception("Requested quantity for {$lockedProduct->name} exceeds available stock.");
+                    }
+                }
+
+                // 2. Jika semua tersedia, buat Order
+                $order = Order::create([
+                    'user_id' => auth()->id(),
+                    'order_date' => now(),
+                    'start_date' => collect($cartItems)->min('start_date'),
+                    'end_date' => collect($cartItems)->max('end_date'),
+                    'pickup_method' => $firstItem['pickup_method'],
+                    'address' => $firstItem['pickup_address'],
+                    'user_name' => $firstItem['user_name'],
+                    'email' => $firstItem['email'],
+                    'phone_number' => $firstItem['phone_number'],
+                    'total_cost' => collect($cartItems)->sum('rental_cost'),
+                    'status' => 'pending',
                 ]);
-            }
 
-            // Bersihkan cart setelah checkout berhasil
-            session()->forget('cart');
+                // 3. Buat Order Items
+                foreach ($cartItems as $item) {
+                    OrderItems::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item['product']['id'],
+                        'quantity' => $item['quantity'],
+                        'address' => $item['pickup_address'],
+                        'pickup_method' => $item['pickup_method'],
+                        'rental_cost' => $item['rental_cost'],
+                    ]);
+                }
 
-            // Schedule job untuk membatalkan order jika tidak dibayar dalam 3 jam
-            CancelOrderJob::dispatch($order->id)->delay(now()->addHours(3));
+                // Bersihkan cart setelah checkout berhasil
+                session()->forget('cart');
 
-            return redirect()->route('checkout.show', $order->id)
-                ->with('success', 'Order created successfully!');
+                // Schedule job untuk membatalkan order jika tidak dibayar dalam 3 jam
+                CancelOrderJob::dispatch($order->id)->delay(now()->addHours(3));
+
+                return redirect()->route('checkout.show', $order->id)
+                    ->with('success', 'Order created successfully!');
+            });
 
         } catch (\Exception $e) {
             Log::error('Checkout Error: ' . $e->getMessage());
-            return redirect('/cart')->withErrors(['error' => 'Failed to process checkout. Please try again.']);
+            // Kembalikan pesan error spesifik jika ada (misal stok habis)
+            return redirect('/cart')->withErrors(['error' => $e->getMessage()]);
         }
     }
 
@@ -246,11 +291,20 @@ class BookingController extends Controller
     public function showCheckout(Order $order)
     {
         $order->load('orderItems.product', 'user');
+
+        return Inertia::render('Bookings/Checkout', [
+            'order' => $order,
+        ]);
+    }
+
+    public function getMidtransToken(Order $order)
+    {
+        $order->load('orderItems.product', 'user');
         $itemDetails = [];
         foreach ($order->orderItems as $orderItem) {
             $itemDetails[] = [
                 'id' => 'P' . $orderItem->product->id,
-                'price' => $orderItem->rental_cost / $orderItem->quantity,
+                'price' => (int) ($orderItem->rental_cost / $orderItem->quantity),
                 'quantity' => $orderItem->quantity,
                 'name' => $orderItem->product->name,
             ];
@@ -265,7 +319,7 @@ class BookingController extends Controller
         $params = array(
             'transaction_details' => array(
                 'order_id' => $order->id . '-' . time(),
-                'gross_amount' => $order->total_cost,
+                'gross_amount' => (int) $order->total_cost,
             ),
             'customer_details' => array(
                 'first_name' => $order->user_name,
@@ -273,14 +327,15 @@ class BookingController extends Controller
                 'phone' => $order->phone_number,
             ),
             'item_details' => $itemDetails
-
         );
-        $snapToken = \Midtrans\Snap::getSnapToken($params);
 
-        return Inertia::render('Bookings/Checkout', [
-            'order' => $order,
-            'snapToken' => $snapToken,
-        ]);
+        try {
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            return response()->json(['token' => $snapToken]);
+        } catch (\Exception $e) {
+            Log::error('Midtrans Token Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 
@@ -403,6 +458,29 @@ class BookingController extends Controller
     /**
      * Tampilkan halaman orders
      */
+    /**
+     * Konfirmasi pembayaran manual
+     */
+    public function confirmManualPayment(Order $order)
+    {
+        if ($order->user_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($order->status !== 'pending') {
+            return response()->json(['error' => 'Order status must be pending'], 400);
+        }
+
+        $order->update([
+            'status' => 'waiting_confirmation',
+        ]);
+
+        return redirect()->route('orders.show')->with('success', 'Payment confirmation submitted. Please wait for admin verification.');
+    }
+
+    /**
+     * Tampilkan halaman orders
+     */
     public function showOrders()
     {
         $orders = Order::where('user_id', auth()->id())
@@ -414,7 +492,17 @@ class BookingController extends Controller
                     $expiryTime = Carbon::parse($order->order_date)->addHours(3);
                     if (now()->isAfter($expiryTime)) {
                         $order->update(['status' => 'cancelled']);
-                        $order->status = 'cancelled'; 
+                        $order->status = 'cancelled';
+                    } else {
+                        $order->expires_at = $expiryTime;
+                    }
+                }
+                // waiting_confirmation expires in 24 hours
+                elseif ($order->status == 'waiting_confirmation') {
+                    $expiryTime = Carbon::parse($order->order_date)->addHours(24);
+                    if (now()->isAfter($expiryTime)) {
+                        $order->update(['status' => 'cancelled']);
+                        $order->status = 'cancelled';
                     } else {
                         $order->expires_at = $expiryTime;
                     }
